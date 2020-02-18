@@ -266,7 +266,7 @@ class ActiveRecordRead implements IStrategyModelRead
             $get_class = get_class($model);
             $run_time = Functions::pettyRunTime($time);
             $memory = intval(memory_get_usage() / 1024 / 1024) . ' MB';
-            $message = "{$__METHOD__}({$get_class}...) -> [Runtime: {$run_time}, Memory: {$memory}] ";
+            $message = "{$__METHOD__}({$get_class}...) -> [Runtime: {$run_time}, Memory: {$memory}]";
             $this->getLogger()->info($message);
         }
         return $this;
