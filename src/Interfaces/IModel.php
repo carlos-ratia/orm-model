@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Cratia\ORM\Model\Interfaces;
 
 
+use Cratia\ORM\DBAL\Interfaces\IAdapter;
 use Cratia\ORM\DQL\Interfaces\IQuery;
 use Cratia\ORM\DQL\Interfaces\ITable;
 use Cratia\ORM\Model\Collection;
+use Psr\Log\LoggerInterface;
 
 /**
  * Interface IModel
@@ -54,4 +56,11 @@ interface IModel
      * @return Collection
      */
     public function read(IQuery $query): Collection;
+
+    /**
+     * @param IAdapter $adapter
+     * @param LoggerInterface|null $logger
+     * @return IModel
+     */
+    public function inject(IAdapter $adapter, ?LoggerInterface $logger): IModel;
 }

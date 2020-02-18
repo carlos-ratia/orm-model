@@ -96,6 +96,49 @@ class ModelReaderTest extends TestCase
      * @throws DependencyException
      * @throws NotFoundException
      */
+    public function testRead4()
+    {
+        $model = new Model3();
+        $model
+            ->setStrategyToRead(new ActiveRecordRead())
+            ->inject(
+                $this->getContainer()->get(IAdapter::class),
+                $this->getContainer()->get(LoggerInterface::class)
+            );
+
+        $field10 = Field::column($model->getFrom(), "id");
+        $field12 = Field::callback(
+            function (array $rawRow) {
+                $newRow = $rawRow;
+                $newRow['connection_id'] = $rawRow['id_connection'];
+                return $newRow;
+            },
+            'connection_id');
+
+        $query = new Query();
+        $query
+            ->addField($field10)
+            ->addField($field12)
+            ->setLimit(1);
+
+        $collection = $model->read($query);
+        $this->assertInstanceOf(Model3::class, $collection->getModel());
+        $this->assertIsArray($collection->getValues());
+        $this->assertNotEmpty($collection->getValues());
+        $this->assertIsInt($collection->getFound());
+        $this->assertInstanceOf(ISql::class, $collection->getSql());
+        $this->assertEquals([], $collection->getSql()->getParams());
+        $this->assertEquals("SELECT SQL_CALC_FOUND_ROWS test1.*, test1.id AS id, 'CALLBACK' AS connection_id FROM {$_ENV['TABLE_TEST']} AS test1 GROUP BY test1.id LIMIT 1 OFFSET 0", $collection->getSql()->getSentence());
+        $this->assertNotEmpty($collection->getValues());
+        $this->assertInstanceOf(ActiveRecordRead::class, $model->getStrategyToRead());
+        $this->assertTrue($model->hasStrategyToRead());
+
+    }
+
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testRead3()
     {
         $message = __METHOD__ . __LINE__;

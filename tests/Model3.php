@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Tests\Cratia\ORM\Model;
 
 
+use Cratia\ORM\DBAL\Interfaces\IAdapter;
 use Cratia\ORM\DQL\Interfaces\ITable;
 use Cratia\ORM\DQL\Table;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Cratia\ORM\Model\Interfaces\IModelRead;
+use Cratia\ORM\Model\Interfaces\IStrategyModelRead;
 use Cratia\ORM\Model\Strategies\Access\AccessBase;
 use Cratia\ORM\Model\Traits\ModelAccess;
 use Cratia\ORM\Model\Traits\ModelReader;
+use Psr\Log\LoggerInterface;
 
 
 class Model3 implements IModelRead, IModel
@@ -89,5 +92,18 @@ class Model3 implements IModelRead, IModel
     public function getKeys()
     {
         return ['id'];
+    }
+
+    /**
+     * @param IAdapter $adapter
+     * @param LoggerInterface|null $logger
+     * @return IModel
+     */
+    public function inject(IAdapter $adapter, ?LoggerInterface $logger): IModel
+    {
+        if (!is_null($this->getStrategyToRead()) && ($this->getStrategyToRead() instanceof IStrategyModelRead)) {
+            $this->getStrategyToRead()->inject($adapter, $logger);
+        }
+        return $this;
     }
 }

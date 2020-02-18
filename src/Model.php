@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Cratia\ORM\Model;
 
 
-use Cratia\ORM\DQL\Interfaces\ITable;
+use Cratia\ORM\DBAL\Interfaces\IAdapter;
 use Cratia\ORM\Model\Interfaces\IModel;
+use Cratia\ORM\Model\Interfaces\IStrategyModelRead;
 use Cratia\ORM\Model\Strategies\Access\AccessBase;
+use Cratia\ORM\Model\Strategies\Mapper\MapperBase;
 use Cratia\ORM\Model\Traits\ModelAccess;
+use Cratia\ORM\Model\Traits\ModelMapper;
 use Cratia\ORM\Model\Traits\ModelReader;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Model
@@ -17,6 +21,7 @@ use Cratia\ORM\Model\Traits\ModelReader;
  */
 abstract class Model implements IModel
 {
+    use ModelMapper;
     use ModelAccess;
     use ModelReader;
 
@@ -26,15 +31,20 @@ abstract class Model implements IModel
     public function __construct()
     {
         $this->_strategyToAccess = new AccessBase();
+        $this->_strategyToMapper = new MapperBase();
     }
 
     /**
-     * @inheritDoc
+     * @param IAdapter $adapter
+     * @param LoggerInterface|null $logger
+     * @return $this
      */
-    abstract public function getFrom(): ITable;
+    public function inject(IAdapter $adapter, ?LoggerInterface $logger): IModel
+    {
+        if (!is_null($this->getStrategyToRead()) && ($this->getStrategyToRead() instanceof IStrategyModelRead)) {
+            $this->getStrategyToRead()->inject($adapter, $logger);
+        }
+        return $this;
+    }
 
-    /**
-     * @inheritDoc
-     */
-    abstract public function getKeys();
 }

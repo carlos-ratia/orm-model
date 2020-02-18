@@ -95,6 +95,36 @@ class ActiveRecordReadTest extends TestCase
         $reader->read($model, $query);
     }
 
+    public function testRead3()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Error in the Cratia\ORM\Model\Strategies\Read\ActiveRecordRead::checkPrerequisite() -> There is no defined adapter.");
+        $this->expectExceptionCode(0);
+
+        $model = new EntityTest();
+        $field10 = Field::column($model->getFrom(), "id");
+        $field11 = Field::column($model->getFrom(), "id_connection_error", "error");
+        $field12 = Field::column($model->getFrom(), "id_connection", "connection_id");
+        $field13 = Field::callback(
+            function (array $rawRow) {
+                $newRow = $rawRow;
+                $newRow['connection_id'] = $rawRow['id_connection'];
+                return $newRow;
+            },
+            'connection_id');
+
+        $query = new Query();
+        $query
+            ->addField($field10)
+            ->addField($field11)
+            ->addField($field12)
+            ->addField($field13)
+            ->setLimit(1);
+
+        $reader = new ActiveRecordRead();
+        $reader->read($model, $query);
+    }
+
     /**
      * @throws DependencyException
      * @throws NotFoundException
@@ -133,5 +163,28 @@ class ActiveRecordReadTest extends TestCase
         $model = new EntityTest(-1);
         $reader = new ActiveRecordRead($this->getContainer()->get(IAdapter::class), $this->getContainer()->get(LoggerInterface::class));
         $reader->load($model);
+    }
+
+    public function testLoad4()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Error in the Cratia\ORM\Model\Strategies\Read\ActiveRecordRead::checkPrerequisite() -> There is no defined adapter.");
+        $this->expectExceptionCode(0);
+        $model = new EntityTest(-1);
+        $reader = new ActiveRecordRead();
+        $reader->load($model);
+    }
+
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
+    public function testLoad5()
+    {
+        $modelOrigin = (new EntityTest(1));
+        $reader = new ActiveRecordRead();
+        $reader->inject($this->getContainer()->get(IAdapter::class), $this->getContainer()->get(LoggerInterface::class));
+        $modelLoad = $reader->load($modelOrigin);
+        $this->assertEqualsCanonicalizing($modelLoad, $modelOrigin);
     }
 }

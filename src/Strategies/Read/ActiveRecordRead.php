@@ -29,7 +29,7 @@ use Psr\Log\LoggerInterface;
 class ActiveRecordRead implements IStrategyModelRead
 {
     /**
-     * @var IAdapter
+     * @var IAdapter|null
      */
     private $adapter;
 
@@ -40,19 +40,19 @@ class ActiveRecordRead implements IStrategyModelRead
 
     /**
      * ActiveRecordRead constructor.
-     * @param IAdapter $adapter
-     * @param LoggerInterface $logger
+     * @param IAdapter|null $adapter
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(IAdapter $adapter, LoggerInterface $logger = null)
+    public function __construct(IAdapter $adapter = null, LoggerInterface $logger = null)
     {
         $this->adapter = $adapter;
         $this->logger = $logger;
     }
 
     /**
-     * @return IAdapter
+     * @return IAdapter|null
      */
-    public function getAdapter(): IAdapter
+    public function getAdapter(): ?IAdapter
     {
         return $this->adapter;
     }
@@ -73,6 +73,9 @@ class ActiveRecordRead implements IStrategyModelRead
     {
         Pipeline::try(
             function () use ($model) {
+                return $this->checkPrerequisite();
+            })
+            ->then(function () use ($model) {
                 return $this->validModelToLoad($model);
             })
             ->then(function () use ($model) {
@@ -92,6 +95,16 @@ class ActiveRecordRead implements IStrategyModelRead
             })();
 
         return $model;
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function checkPrerequisite()
+    {
+        if (is_null($this->getAdapter()) || !($this->getAdapter() instanceof IAdapter)) {
+            throw new Exception("Error in the " . __METHOD__ . "() -> There is no defined adapter.");
+        }
     }
 
     /**
@@ -189,6 +202,10 @@ class ActiveRecordRead implements IStrategyModelRead
     public function read(IModel $model, IQuery $query): Collection
     {
         return Pipeline::try(
+            function () use ($model) {
+                return $this->checkPrerequisite();
+            })
+            ->then(
             function () use ($query, $model) {
                 return $this->createQueryToRead($model, $query);
             })
@@ -270,5 +287,15 @@ class ActiveRecordRead implements IStrategyModelRead
             $this->getLogger()->info($message);
         }
         return $this;
+    }
+
+    /**
+     * @param IAdapter $adapter
+     * @param LoggerInterface|null $logger
+     */
+    public function inject(IAdapter $adapter, ?LoggerInterface $logger)
+    {
+        $this->adapter = $adapter;
+        $this->logger = $logger;
     }
 }
