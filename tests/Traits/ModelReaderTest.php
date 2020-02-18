@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Test\Cratia\ORM\Model\Traits;
+namespace Tests\Cratia\ORM\Model\Traits;
 
 
 use Cratia\ORM\DBAL\Interfaces\IAdapter;
@@ -9,12 +9,12 @@ use Cratia\ORM\DQL\Field;
 use Cratia\ORM\DQL\Interfaces\ISql;
 use Cratia\ORM\DQL\Query;
 use Cratia\ORM\Model\Interfaces\IModel;
-use Cratia\ORM\Model\Model;
 use Cratia\ORM\Model\Strategies\Read\ActiveRecordRead;
+use DI\DependencyException;
+use DI\NotFoundException;
 use Doctrine\DBAL\DBALException;
 use Exception;
 use Psr\Log\LoggerInterface;
-use Test\Cratia\ORM\Model\EntityTest;
 use Tests\Cratia\ORM\Model\Model3;
 use Tests\Cratia\ORM\Model\TestCase;
 
@@ -24,6 +24,10 @@ use Tests\Cratia\ORM\Model\TestCase;
  */
 class ModelReaderTest extends TestCase
 {
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testRead1()
     {
         $model = new Model3();
@@ -63,6 +67,10 @@ class ModelReaderTest extends TestCase
 
     }
 
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testRead2()
     {
         $this->expectException(DBALException::class);
@@ -83,6 +91,10 @@ class ModelReaderTest extends TestCase
         $model->read($query);
     }
 
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testRead3()
     {
         $message = __METHOD__ . __LINE__;
@@ -117,6 +129,10 @@ class ModelReaderTest extends TestCase
 
     }
 
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testLoad1()
     {
         $model = new Model3(1);
@@ -139,6 +155,10 @@ class ModelReaderTest extends TestCase
 
     }
 
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testLoad2()
     {
         $this->expectException(Exception::class);
@@ -154,6 +174,10 @@ class ModelReaderTest extends TestCase
         $model->load();
     }
 
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testLoad3()
     {
         $this->expectException(Exception::class);

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 
-namespace Tests\Cratia\Models\ORM\Model\Strategies\Read;
+namespace Tests\Cratia\ORM\Model\Strategies\Read;
 
 
 use Cratia\ORM\DBAL\Interfaces\IAdapter;
@@ -10,19 +10,25 @@ use Cratia\ORM\DQL\Field;
 use Cratia\ORM\DQL\Interfaces\ISql;
 use Cratia\ORM\DQL\Query;
 use Cratia\ORM\Model\Strategies\Read\ActiveRecordRead;
+use DI\DependencyException;
+use DI\NotFoundException;
 use Doctrine\DBAL\DBALException;
 use Exception;
 use Psr\Log\LoggerInterface;
-use Test\Cratia\ORM\Model\EntityTest;
+use Tests\Cratia\ORM\Model\EntityTest;
 use Tests\Cratia\ORM\Model\TestCase;
 
 
 /**
  * Class ActiveRecordReadTest
- * @package Tests\Cratia\Models\ORM\Model\Strategies\Read
+ * @package Tests\Cratia\ORM\Model\Strategies\Read
  */
 class ActiveRecordReadTest extends TestCase
 {
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testRead1()
     {
         $model = new EntityTest();
@@ -55,6 +61,10 @@ class ActiveRecordReadTest extends TestCase
         $this->assertNotEmpty($collection->getValues());
     }
 
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testRead2()
     {
         $this->expectException(DBALException::class);
@@ -85,6 +95,10 @@ class ActiveRecordReadTest extends TestCase
         $reader->read($model, $query);
     }
 
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testLoad1()
     {
         $modelOrigin = (new EntityTest(1));
@@ -93,20 +107,28 @@ class ActiveRecordReadTest extends TestCase
         $this->assertEqualsCanonicalizing($modelLoad, $modelOrigin);
     }
 
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testLoad2()
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Error in ActiveRecordRead::load(Test\Cratia\ORM\Model\EntityTest...)->validModelToLoad(...) -> The key fields ([\"id\"]) are NULL or not DEFINED.");
+        $this->expectExceptionMessage("Error in ActiveRecordRead::load(Tests\Cratia\ORM\Model\EntityTest...)->validModelToLoad(...) -> The key fields ([\"id\"]) are NULL or not DEFINED.");
         $this->expectExceptionCode(0);
         $model = new EntityTest();
         $reader = new ActiveRecordRead($this->getContainer()->get(IAdapter::class), $this->getContainer()->get(LoggerInterface::class));
         $reader->load($model);
     }
 
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
     public function testLoad3()
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Error in ActiveRecordRead::load(Test\Cratia\ORM\Model\EntityTest...)->executeQueryToLoad(...) -> The model Test\Cratia\ORM\Model\EntityTest({id: -1}) not exist.");
+        $this->expectExceptionMessage("Error in ActiveRecordRead::load(Tests\Cratia\ORM\Model\EntityTest...)->executeQueryToLoad(...) -> The model Tests\Cratia\ORM\Model\EntityTest({id: -1}) not exist.");
         $this->expectExceptionCode(412);
         $model = new EntityTest(-1);
         $reader = new ActiveRecordRead($this->getContainer()->get(IAdapter::class), $this->getContainer()->get(LoggerInterface::class));

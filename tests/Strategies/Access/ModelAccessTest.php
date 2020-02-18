@@ -2,11 +2,10 @@
 declare(strict_types=1);
 
 
-namespace Tests\Cratia\Model\ORM\Strategies\Access;
+namespace Tests\Cratia\ORM\Model\Strategies\Access;
 
 
-
-use Cratia\ORM\Model\Strategies\Access\ModelAccess;
+use Cratia\ORM\Model\Strategies\Access\AccessBase;
 use Tests\Cratia\ORM\Model\Model1;
 use Tests\Cratia\ORM\Model\Model4;
 use Tests\Cratia\ORM\Model\TestCase;
@@ -21,7 +20,7 @@ class ModelAccessTest extends TestCase
     public function testGet1()
     {
         $model = new Model1(10, 20, 30);
-        $access = new ModelAccess();
+        $access = new AccessBase();
         $access1 = $access->_get($model, 'property_1');
         $access2 = $access->_get($model, 'property_2');
         $access3 = $access->_get($model, 'property_3');
@@ -39,7 +38,7 @@ class ModelAccessTest extends TestCase
     public function testGet2()
     {
         $model = new Model4(10, 20, 30);
-        $access = new ModelAccess();
+        $access = new AccessBase();
         $access1 = $access->_get($model, 'property_1');
         $access2 = $access->_get($model, 'property_2');
         $access3 = $access->_get($model, 'property_3');
@@ -54,7 +53,7 @@ class ModelAccessTest extends TestCase
     public function testSet1()
     {
         $model = new Model1();
-        $access = new ModelAccess();
+        $access = new AccessBase();
         $set1 = $access->_set($model, 'property_1', 11);
         $set2 = $access->_set($model, 'property_2', 22);
         $set3 = $access->_set($model, 'property_3', 33);
@@ -71,7 +70,7 @@ class ModelAccessTest extends TestCase
     public function testSet2()
     {
         $model = new Model4();
-        $access = new ModelAccess();
+        $access = new AccessBase();
         $set1 = $access->_set($model, 'property_1', 11);
         $set2 = $access->_set($model, 'property_2', 22);
         $set3 = $access->_set($model, 'property_3', 33);
@@ -88,7 +87,7 @@ class ModelAccessTest extends TestCase
     public function testIsset1()
     {
         $model = new Model1(10, null, 20);
-        $access = new ModelAccess();
+        $access = new AccessBase();
         $isset1 = $access->_isset($model, 'property_1');
         $isset2 = $access->_isset($model, 'property_2');
         $isset3 = $access->_isset($model, 'property_3');
@@ -106,7 +105,7 @@ class ModelAccessTest extends TestCase
     public function testIsset2()
     {
         $model = new Model1();
-        $access = new ModelAccess();
+        $access = new AccessBase();
         $isset1 = $access->_isset($model, 'property_1');
         $isset2 = $access->_isset($model, 'property_2');
         $isset3 = $access->_isset($model, 'property_3');

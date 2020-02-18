@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 
-namespace Test\Cratia\ORM\Model\Infraestructure\Persistence;
+namespace Tests\Cratia\ORM\Model\Infraestructure\Persistence;
 
 
 use Cratia\ORM\DBAL\Interfaces\IAdapter;

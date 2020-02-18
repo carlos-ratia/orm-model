@@ -1,15 +1,16 @@
 <?php
 
+
 namespace Cratia\ORM\Model\Strategies\Access;
 
 use Cratia\ORM\Model\Interfaces\IStrategyModelAccess;
 use ReflectionClass;
 
 /**
- * Class ModelAccess
+ * Class AccessBase
  * @package Cratia\ORM\Model\Strategies\Access
  */
-class ModelAccess implements IStrategyModelAccess
+class AccessBase implements IStrategyModelAccess
 {
     /**
      * @inheritDoc

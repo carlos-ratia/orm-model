@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Tests\Cratia\Model\Common;
+namespace Tests\Cratia\ORM\Model\Common;
 
 
 use Cratia\ORM\Model\Common\Functions;

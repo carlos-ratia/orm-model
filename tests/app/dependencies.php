@@ -11,7 +11,7 @@ use Monolog\Processor\MemoryUsageProcessor;
 use Monolog\Processor\UidProcessor;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Test\Cratia\ORM\Model\Infraestructure\Persistence\DataBase;
+use Tests\Cratia\ORM\Model\Infraestructure\Persistence\DataBase;
 
 return function (ContainerBuilder $containerBuilder) {
     $containerBuilder->addDefinitions([
@@ -31,7 +31,7 @@ return function (ContainerBuilder $containerBuilder) {
             return $logger;
         },
 
-        IAdapter::class => function (ContainerInterface $c) {
+        IAdapter::class => function () {
             return new DataBase();
         }
     ]);

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 
-namespace Test\Cratia\ORM\Model;
+namespace Tests\Cratia\ORM\Model;
 
 
 use Cratia\ORM\DQL\Interfaces\ITable;

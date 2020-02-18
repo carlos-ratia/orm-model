@@ -7,6 +7,7 @@ namespace Cratia\ORM\Model;
 
 use Cratia\ORM\DQL\Interfaces\ITable;
 use Cratia\ORM\Model\Interfaces\IModel;
+use Cratia\ORM\Model\Strategies\Access\AccessBase;
 use Cratia\ORM\Model\Traits\ModelAccess;
 use Cratia\ORM\Model\Traits\ModelReader;
 
@@ -24,7 +25,7 @@ abstract class Model implements IModel
      */
     public function __construct()
     {
-        $this->_strategyToAccess = new \Cratia\ORM\Model\Strategies\Access\ModelAccess();
+        $this->_strategyToAccess = new AccessBase();
     }
 
     /**
