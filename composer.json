@@ -1,0 +1,44 @@
+{
+    "name": "cratia/orm-model",
+    "description": "Model is a PHP object based in Active Record Pattern + Strategy Pattern and that sits on top of a powerful database abstraction layer (DBAL). One of its key features is the option to write database queries in a proprietary object oriented SQL dialect called Dialect Query Language (DQL).",
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "^9.0",
+        "monolog/monolog": "^2.0",
+        "php-di/php-di": "^6.0",
+        "symfony/dotenv": "^5.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Carlos Ratia",
+            "email": "cratia.github@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.1",
+        "doctrine/collections": "^1.6",
+        "cratia/orm-dql": ">=0.3",
+        "cratia/orm-dbal": ">=0.4",
+        "cratia/pipeline": ">=0.7",
+        "psr/log": "^1.1",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ],
+        "psr-4": {
+            "Cratia\\ORM\\Model\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/"
+        ],
+        "psr-4": {
+            "Tests\\Cratia\\ORM\\Model\\": "tests/"
+        }
+    }
+}
