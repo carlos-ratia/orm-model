@@ -1,11 +1,12 @@
 <?php
+declare(strict_types=1);
+
 
 namespace Cratia\ORM\Model\Interfaces;
 
 
 use Cratia\ORM\DQL\Interfaces\IRelation;
 use Cratia\ORM\DQL\Interfaces\ITable;
-use ReflectionException;
 
 /**
  * Class MapperBase
@@ -42,7 +43,6 @@ interface IStrategyModelMapper
     /**
      * @param  $model
      * @return array
-     * @throws ReflectionException
      */
     public function getKeys($model);
 }

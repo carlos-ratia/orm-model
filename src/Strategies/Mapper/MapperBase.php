@@ -13,7 +13,6 @@ use Cratia\ORM\Model\Common\ReflectionProperty;
 use Cratia\ORM\Model\Interfaces\IStrategyModelMapper;
 use Cratia\ORM\Model\Strategies;
 use Cratia\ORM\Model\Common\ReflectionModel;
-use ReflectionException;
 
 
 /**
@@ -82,7 +81,6 @@ class MapperBase implements IStrategyModelMapper
     /**
      * @param  $model
      * @return array
-     * @throws ReflectionException
      */
     public function getKeys($model)
     {

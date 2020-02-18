@@ -8,22 +8,20 @@ use Cratia\ORM\Model\Interfaces\IModelMapper;
 use Cratia\ORM\Model\Traits\ModelMapper;
 
 /**
- * Class Model6
+ * Class Model7
  * @package Tests\Cratia\ORM\Model
  */
-class Model6 implements IModelMapper
+class Model7 implements IModelMapper
 {
     use ModelMapper;
 
     /**
      * @var int|null
-     * @key
      */
     private $property_1;
 
     /**
      * @var int|null
-     * @key
      */
     public $property_2;
 
