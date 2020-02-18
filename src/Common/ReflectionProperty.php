@@ -47,54 +47,72 @@ class ReflectionProperty extends \ReflectionProperty
     /**
      * @return bool
      */
-    public function isAllowUnderscore()
+    public function isAllowUnderscore(): bool
     {
-        return strpos($this->getDocComment(), self::ALLOW_UNDERSCORE) !== false;
+        if ($this->getDocComment() === false) {
+            return false;
+        } else {
+            return strpos($this->getDocComment(), self::ALLOW_UNDERSCORE) !== false;
+        }
     }
 
     /**
      * @return bool
      */
-    public function isHidden()
+    public function isHidden(): bool
     {
-        return strpos($this->getDocComment(), self::EXCLUDE_TO_RENDER) !== false;
+        if ($this->getDocComment() === false) {
+            return false;
+        } else {
+            return strpos($this->getDocComment(), self::EXCLUDE_TO_RENDER) !== false;
+        }
     }
 
     /**
      * @return bool
      */
-    public function isKey()
+    public function isKey(): bool
     {
-        return strpos($this->getDocComment(), self::KEY) !== false;
-    }
-
-//    public function isExcludeToRender()
-//    {
-//        return $this->isHidden() &&
-//            !\Core\BunkerApiProxy::getInstance()->isDebug();
-//    }
-
-    /**
-     * @return bool
-     */
-    public function isRequired()
-    {
-        return strpos($this->getDocComment(), self::REQUIRED) !== false;
+        if ($this->getDocComment() === false) {
+            return false;
+        } else {
+            return strpos($this->getDocComment(), self::KEY) !== false;
+        }
     }
 
     /**
      * @return bool
      */
-    public function isAutoIncremental()
+    public function isRequired(): bool
     {
-        return strpos($this->getDocComment(), self::AUTOINCREMENTAL) !== false;
+        if ($this->getDocComment() === false) {
+            return false;
+        } else {
+            return strpos($this->getDocComment(), self::REQUIRED) !== false;
+        }
     }
 
     /**
      * @return bool
      */
-    public function isNoQueryable()
+    public function isAutoIncremental(): bool
     {
-        return strpos($this->getDocComment(), self::NOQUERYABLE) !== false;
+        if ($this->getDocComment() === false) {
+            return false;
+        } else {
+            return strpos($this->getDocComment(), self::AUTOINCREMENTAL) !== false;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNoQueryable(): bool
+    {
+        if ($this->getDocComment() === false) {
+            return false;
+        } else {
+            return strpos($this->getDocComment(), self::NOQUERYABLE) !== false;
+        }
     }
 }
