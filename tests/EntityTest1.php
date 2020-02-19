@@ -13,7 +13,7 @@ use Cratia\ORM\Model\Model;
  * Class Entity
  * @package App\Application\Models
  */
-class EntityTest extends Model
+class EntityTest1 extends Model
 {
     /**
      * @var int|null
@@ -45,9 +45,9 @@ class EntityTest extends Model
 
     /**
      * @param int|null $id
-     * @return EntityTest
+     * @return EntityTest1
      */
-    public function setId(?int $id): EntityTest
+    public function setId(?int $id): EntityTest1
     {
         $this->id = $id;
         return $this;
@@ -63,9 +63,9 @@ class EntityTest extends Model
 
     /**
      * @param string $network_params
-     * @return EntityTest
+     * @return EntityTest1
      */
-    public function setNetworkParams(string $network_params): EntityTest
+    public function setNetworkParams(string $network_params): EntityTest1
     {
         $this->network_params = $network_params;
         return $this;

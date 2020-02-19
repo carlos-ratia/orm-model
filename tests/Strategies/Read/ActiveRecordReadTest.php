@@ -15,7 +15,7 @@ use DI\NotFoundException;
 use Doctrine\DBAL\DBALException;
 use Exception;
 use Psr\Log\LoggerInterface;
-use Tests\Cratia\ORM\Model\EntityTest;
+use Tests\Cratia\ORM\Model\EntityTest1;
 use Tests\Cratia\ORM\Model\TestCase;
 
 
@@ -31,7 +31,7 @@ class ActiveRecordReadTest extends TestCase
      */
     public function testRead1()
     {
-        $model = new EntityTest();
+        $model = new EntityTest1();
         $field10 = Field::column($model->getFrom(), "id");
         $field11 = Field::column($model->getFrom(), "id_connection", "connection_id");
         $field12 = Field::callback(
@@ -51,7 +51,7 @@ class ActiveRecordReadTest extends TestCase
 
         $reader = new ActiveRecordRead($this->getContainer()->get(IAdapter::class), $this->getContainer()->get(LoggerInterface::class));
         $collection = $reader->read($model, $query);
-        $this->assertInstanceOf(EntityTest::class, $collection->getModel());
+        $this->assertInstanceOf(EntityTest1::class, $collection->getModel());
         $this->assertIsArray($collection->getValues());
         $this->assertNotEmpty($collection->getValues());
         $this->assertIsInt($collection->getFound());
@@ -71,7 +71,7 @@ class ActiveRecordReadTest extends TestCase
         $this->expectExceptionMessage("An exception occurred while executing 'SELECT SQL_CALC_FOUND_ROWS test1.*, test1.id AS id, test1.id_connection_error AS error, test1.id_connection AS connection_id, 'CALLBACK' AS connection_id FROM {$_ENV['TABLE_TEST']} AS test1 GROUP BY test1.id LIMIT 1 OFFSET 0");
         $this->expectExceptionCode(0);
 
-        $model = new EntityTest();
+        $model = new EntityTest1();
         $field10 = Field::column($model->getFrom(), "id");
         $field11 = Field::column($model->getFrom(), "id_connection_error", "error");
         $field12 = Field::column($model->getFrom(), "id_connection", "connection_id");
@@ -101,7 +101,7 @@ class ActiveRecordReadTest extends TestCase
         $this->expectExceptionMessage("Error in the Cratia\ORM\Model\Strategies\Read\ActiveRecordRead::checkPrerequisite() -> There is no defined adapter.");
         $this->expectExceptionCode(0);
 
-        $model = new EntityTest();
+        $model = new EntityTest1();
         $field10 = Field::column($model->getFrom(), "id");
         $field11 = Field::column($model->getFrom(), "id_connection_error", "error");
         $field12 = Field::column($model->getFrom(), "id_connection", "connection_id");
@@ -131,7 +131,7 @@ class ActiveRecordReadTest extends TestCase
      */
     public function testLoad1()
     {
-        $modelOrigin = (new EntityTest(1));
+        $modelOrigin = (new EntityTest1(1));
         $reader = new ActiveRecordRead($this->getContainer()->get(IAdapter::class), $this->getContainer()->get(LoggerInterface::class));
         $modelLoad = $reader->load($modelOrigin);
         $this->assertEqualsCanonicalizing($modelLoad, $modelOrigin);
@@ -144,9 +144,9 @@ class ActiveRecordReadTest extends TestCase
     public function testLoad2()
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Error in ActiveRecordRead::load(Tests\Cratia\ORM\Model\EntityTest...)->validModelToLoad(...) -> The key fields ([\"id\"]) are NULL or not DEFINED.");
+        $this->expectExceptionMessage("Error in ActiveRecordRead::load(Tests\Cratia\ORM\Model\EntityTest1...)->validModelToLoad(...) -> The key fields ([\"id\"]) are NULL or not DEFINED.");
         $this->expectExceptionCode(0);
-        $model = new EntityTest();
+        $model = new EntityTest1();
         $reader = new ActiveRecordRead($this->getContainer()->get(IAdapter::class), $this->getContainer()->get(LoggerInterface::class));
         $reader->load($model);
     }
@@ -158,9 +158,9 @@ class ActiveRecordReadTest extends TestCase
     public function testLoad3()
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Error in ActiveRecordRead::load(Tests\Cratia\ORM\Model\EntityTest...)->executeQueryToLoad(...) -> The model Tests\Cratia\ORM\Model\EntityTest({id: -1}) not exist.");
+        $this->expectExceptionMessage("Error in ActiveRecordRead::load(Tests\Cratia\ORM\Model\EntityTest1...)->executeQueryToLoad(...) -> The model Tests\Cratia\ORM\Model\EntityTest1({id: -1}) not exist.");
         $this->expectExceptionCode(412);
-        $model = new EntityTest(-1);
+        $model = new EntityTest1(-1);
         $reader = new ActiveRecordRead($this->getContainer()->get(IAdapter::class), $this->getContainer()->get(LoggerInterface::class));
         $reader->load($model);
     }
@@ -170,7 +170,7 @@ class ActiveRecordReadTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("Error in the Cratia\ORM\Model\Strategies\Read\ActiveRecordRead::checkPrerequisite() -> There is no defined adapter.");
         $this->expectExceptionCode(0);
-        $model = new EntityTest(-1);
+        $model = new EntityTest1(-1);
         $reader = new ActiveRecordRead();
         $reader->load($model);
     }
@@ -181,7 +181,7 @@ class ActiveRecordReadTest extends TestCase
      */
     public function testLoad5()
     {
-        $modelOrigin = (new EntityTest(1));
+        $modelOrigin = (new EntityTest1(1));
         $reader = new ActiveRecordRead();
         $reader->inject($this->getContainer()->get(IAdapter::class), $this->getContainer()->get(LoggerInterface::class));
         $modelLoad = $reader->load($modelOrigin);

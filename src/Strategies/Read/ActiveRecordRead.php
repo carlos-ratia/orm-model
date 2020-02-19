@@ -293,7 +293,7 @@ class ActiveRecordRead implements IStrategyModelRead
      * @param IAdapter $adapter
      * @param LoggerInterface|null $logger
      */
-    public function inject(IAdapter $adapter, ?LoggerInterface $logger)
+    public function inject(IAdapter $adapter, LoggerInterface $logger = null)
     {
         $this->adapter = $adapter;
         $this->logger = $logger;

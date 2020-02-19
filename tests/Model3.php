@@ -99,7 +99,7 @@ class Model3 implements IModelRead, IModel
      * @param LoggerInterface|null $logger
      * @return IModel
      */
-    public function inject(IAdapter $adapter, ?LoggerInterface $logger): IModel
+    public function inject(IAdapter $adapter, LoggerInterface $logger = null): IModel
     {
         if (!is_null($this->getStrategyToRead()) && ($this->getStrategyToRead() instanceof IStrategyModelRead)) {
             $this->getStrategyToRead()->inject($adapter, $logger);

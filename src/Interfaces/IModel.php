@@ -62,5 +62,5 @@ interface IModel
      * @param LoggerInterface|null $logger
      * @return IModel
      */
-    public function inject(IAdapter $adapter, ?LoggerInterface $logger): IModel;
+    public function inject(IAdapter $adapter, LoggerInterface $logger = null): IModel;
 }

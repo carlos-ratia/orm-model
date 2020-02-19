@@ -32,5 +32,5 @@ interface IStrategyModelRead
      * @param IAdapter $adapter
      * @param LoggerInterface|null $logger
      */
-    public function inject(IAdapter $adapter, ?LoggerInterface $logger);
+    public function inject(IAdapter $adapter, LoggerInterface $logger = null);
 }
