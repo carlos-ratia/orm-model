@@ -182,7 +182,12 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
 
         $sql_params = [];
         foreach ($fields as $field) {
-            $sql_params[] = $model->{$field->getName()};
+            if (is_bool($model->{$field->getName()})) {
+                $value = filter_var($model->{$field->getName()}, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+            } else {
+                $value = $model->{$field->getName()};
+            }
+            $sql_params[] = $value;
         }
 
         $sql = new Sql();
@@ -228,15 +233,25 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
         $sql_values = implode(',', $sql_values);
 
         $sql_params = array_map(function (ReflectionProperty $property) use ($model) {
-            return $model->{$property->getName()};
+            if (is_bool($model->{$property->getName()})) {
+                $value = filter_var($model->{$property->getName()}, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+            } else {
+                $value = $model->{$property->getName()};
+            }
+            return $value;
         }, $fields);
         $sql_params = array_values($sql_params);
 
         $keys = $model->getKeys();
         $where = FilterGroup::and();
         foreach ($keys as $key) {
+            if (is_bool($model->{$key})) {
+                $value = filter_var($model->{$key}, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+            } else {
+                $value = $model->{$key};
+            }
             $where->add(
-                Filter::eq($model->getField($key), $model->{$key})
+                Filter::eq($model->getField($key), $value)
             );
         }
 
