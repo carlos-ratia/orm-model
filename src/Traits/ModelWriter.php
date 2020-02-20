@@ -6,6 +6,7 @@ namespace Cratia\ORM\Model\Traits;
 
 use Cratia\ORM\Model\Interfaces\IStrategyModelWrite;
 use Doctrine\DBAL\DBALException;
+use Exception;
 
 /**
  * Trait ModelWriter
@@ -37,7 +38,19 @@ trait ModelWriter
     }
 
     /**
+     * @return bool
+     */
+    public function hasStrategyToWrite()
+    {
+        if (is_null($this->getStrategyToWrite())) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @return string
+     * @throws Exception
      * @throws DBALException
      */
     public function create()
@@ -47,6 +60,7 @@ trait ModelWriter
 
     /**
      * @return bool
+     * @throws Exception
      * @throws DBALException
      */
     public function update()

@@ -12,6 +12,7 @@ use Cratia\ORM\Model\Interfaces\IStrategyModelWrite;
 use Cratia\ORM\Model\Strategies\Access\AccessBase;
 use Cratia\ORM\Model\Strategies\Mapper\MapperBase;
 use Cratia\ORM\Model\Strategies\Read\ActiveRecordRead;
+use Cratia\ORM\Model\Strategies\Read\ActiveRecordWrite;
 use Cratia\ORM\Model\Traits\ModelAccess;
 use Cratia\ORM\Model\Traits\ModelMapper;
 use Cratia\ORM\Model\Traits\ModelReader;
@@ -37,6 +38,7 @@ abstract class Model implements IModel
         $this->_strategyToAccess = new AccessBase();
         $this->_strategyToMapper = new MapperBase();
         $this->_strategyToRead = new ActiveRecordRead();
+        $this->_strategyToWrite = new ActiveRecordWrite();
     }
 
     /**

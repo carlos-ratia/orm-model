@@ -12,21 +12,26 @@ use Cratia\ORM\DQL\Interfaces\ITable;
 use Cratia\ORM\DQL\Table;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Cratia\ORM\Model\Interfaces\IModelRead;
+use Cratia\ORM\Model\Interfaces\IModelWriter;
 use Cratia\ORM\Model\Interfaces\IStrategyModelRead;
 use Cratia\ORM\Model\Strategies\Access\AccessBase;
 use Cratia\ORM\Model\Traits\ModelAccess;
 use Cratia\ORM\Model\Traits\ModelReader;
+use Cratia\ORM\Model\Traits\ModelWriter;
 use Exception;
 use Psr\Log\LoggerInterface;
 
 
-class Model3 implements IModelRead, IModel
+class Model3 implements IModelRead, IModelWriter, IModel
 {
     use ModelAccess;
     use ModelReader;
+    use ModelWriter;
 
     /**
      * @var int|null
+     * @key
+     * @autoincremental
      */
     private $id;
 
@@ -34,6 +39,21 @@ class Model3 implements IModelRead, IModel
      * @var string|null
      */
     private $network_params;
+
+
+    private $network_service;
+
+    /**
+     * @var int
+     * @required
+     */
+    private $id_connection;
+
+    /**
+     * @var string|null
+     * @required
+     */
+    private $error_exception;
 
     /**
      * Entity constructor.
@@ -55,16 +75,16 @@ class Model3 implements IModelRead, IModel
 
     /**
      * @param int|null $id
-     * @return $this
+     * @return Model3
      */
-    public function setId(?int $id): self
+    public function setId(?int $id): Model3
     {
         $this->id = $id;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getNetworkParams(): ?string
     {
@@ -72,12 +92,66 @@ class Model3 implements IModelRead, IModel
     }
 
     /**
-     * @param string $network_params
-     * @return $this
+     * @param string|null $network_params
+     * @return Model3
      */
-    public function setNetworkParams(string $network_params): self
+    public function setNetworkParams(?string $network_params): Model3
     {
         $this->network_params = $network_params;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNetworkService()
+    {
+        return $this->network_service;
+    }
+
+    /**
+     * @param mixed $network_service
+     * @return Model3
+     */
+    public function setNetworkService($network_service)
+    {
+        $this->network_service = $network_service;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIdConnection(): int
+    {
+        return $this->id_connection;
+    }
+
+    /**
+     * @param int $id_connection
+     * @return Model3
+     */
+    public function setIdConnection(int $id_connection): Model3
+    {
+        $this->id_connection = $id_connection;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getErrorException(): ?string
+    {
+        return $this->error_exception;
+    }
+
+    /**
+     * @param string|null $error_exception
+     * @return Model3
+     */
+    public function setErrorException(?string $error_exception): Model3
+    {
+        $this->error_exception = $error_exception;
         return $this;
     }
 
