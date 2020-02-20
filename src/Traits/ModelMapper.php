@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+
 namespace Cratia\ORM\Model\Traits;
 
 use Cratia\ORM\DQL\Interfaces\IField;

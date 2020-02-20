@@ -8,12 +8,14 @@ namespace Cratia\ORM\Model;
 use Cratia\ORM\DBAL\Interfaces\IAdapter;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Cratia\ORM\Model\Interfaces\IStrategyModelRead;
+use Cratia\ORM\Model\Interfaces\IStrategyModelWrite;
 use Cratia\ORM\Model\Strategies\Access\AccessBase;
 use Cratia\ORM\Model\Strategies\Mapper\MapperBase;
 use Cratia\ORM\Model\Strategies\Read\ActiveRecordRead;
 use Cratia\ORM\Model\Traits\ModelAccess;
 use Cratia\ORM\Model\Traits\ModelMapper;
 use Cratia\ORM\Model\Traits\ModelReader;
+use Cratia\ORM\Model\Traits\ModelWriter;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -25,6 +27,7 @@ abstract class Model implements IModel
     use ModelMapper;
     use ModelAccess;
     use ModelReader;
+    use ModelWriter;
 
     /**
      * Model constructor.
@@ -45,6 +48,9 @@ abstract class Model implements IModel
     {
         if (!is_null($this->getStrategyToRead()) && ($this->getStrategyToRead() instanceof IStrategyModelRead)) {
             $this->getStrategyToRead()->inject($adapter, $logger);
+        }
+        if (!is_null($this->getStrategyToWrite()) && ($this->getStrategyToWrite() instanceof IStrategyModelWrite)) {
+            $this->getStrategyToWrite()->inject($adapter, $logger);
         }
         return $this;
     }

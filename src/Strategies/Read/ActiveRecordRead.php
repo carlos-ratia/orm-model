@@ -14,9 +14,9 @@ use Cratia\ORM\DQL\GroupBy;
 use Cratia\ORM\DQL\Interfaces\IQuery;
 use Cratia\ORM\DQL\Query;
 use Cratia\ORM\Model\Collection;
-use Cratia\ORM\Model\Common\Functions;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Cratia\ORM\Model\Interfaces\IStrategyModelRead;
+use Cratia\ORM\Model\Strategies\ActiveRecord;
 use Cratia\Pipeline;
 use Doctrine\DBAL\DBALException;
 use Exception;
@@ -26,18 +26,8 @@ use Psr\Log\LoggerInterface;
  * Class ActiveRecordRead
  * @package Cratia\ORM\Model\Strategies\Read
  */
-class ActiveRecordRead implements IStrategyModelRead
+class ActiveRecordRead extends ActiveRecord implements IStrategyModelRead
 {
-    /**
-     * @var IAdapter|null
-     */
-    private $adapter;
-
-    /**
-     * @var LoggerInterface|null
-     */
-    private $logger;
-
     /**
      * ActiveRecordRead constructor.
      * @param IAdapter|null $adapter
@@ -45,24 +35,7 @@ class ActiveRecordRead implements IStrategyModelRead
      */
     public function __construct(IAdapter $adapter = null, LoggerInterface $logger = null)
     {
-        $this->adapter = $adapter;
-        $this->logger = $logger;
-    }
-
-    /**
-     * @return IAdapter|null
-     */
-    public function getAdapter(): ?IAdapter
-    {
-        return $this->adapter;
-    }
-
-    /**
-     * @return LoggerInterface|null
-     */
-    public function getLogger(): ?LoggerInterface
-    {
-        return $this->logger;
+        parent::__construct($adapter, $logger);
     }
 
     /**
@@ -206,9 +179,9 @@ class ActiveRecordRead implements IStrategyModelRead
                 return $this->checkPrerequisite();
             })
             ->then(
-            function () use ($query, $model) {
-                return $this->createQueryToRead($model, $query);
-            })
+                function () use ($query, $model) {
+                    return $this->createQueryToRead($model, $query);
+                })
             ->then(function (IQuery $query) use ($model) {
                 return $this->executeQueryToRead($model, $query);
             })
@@ -269,33 +242,5 @@ class ActiveRecordRead implements IStrategyModelRead
     protected function createCollectionToRead(IModel $model, IQueryDTO $dto): Collection
     {
         return new Collection($model, $dto->getFound(), $dto->getSql(), $dto->getRows());
-    }
-
-    /**
-     * @param string $__METHOD__
-     * @param IModel $model
-     * @param $time
-     * @return $this
-     */
-    protected function logRunTime(IModel $model, string $__METHOD__, $time): self
-    {
-        if (!is_null($this->getLogger())) {
-            $get_class = get_class($model);
-            $run_time = Functions::pettyRunTime($time);
-            $memory = intval(memory_get_usage() / 1024 / 1024) . ' MB';
-            $message = "{$__METHOD__}({$get_class}...) -> [Runtime: {$run_time}, Memory: {$memory}]";
-            $this->getLogger()->info($message);
-        }
-        return $this;
-    }
-
-    /**
-     * @param IAdapter $adapter
-     * @param LoggerInterface|null $logger
-     */
-    public function inject(IAdapter $adapter, LoggerInterface $logger = null)
-    {
-        $this->adapter = $adapter;
-        $this->logger = $logger;
     }
 }

@@ -153,4 +153,21 @@ class ActiveRecordWriteTest extends TestCase
         $this->assertEquals('UPDATE', $modelLoad->{'network_service'});
         $this->assertEquals('UPDATE', $modelLoad->{'error_exception'});
     }
+
+    public function testInject1()
+    {
+        $writer = new ActiveRecordWrite();
+
+        $this->assertNull($writer->getAdapter());
+        $this->assertNull($writer->getLogger());
+
+        $this->assertNotNull($this->getContainer()->get(IAdapter::class));
+        $this->assertNotNull($this->getContainer()->get(IAdapter::class));
+
+        $writer->inject($this->getContainer()->get(IAdapter::class), $this->getContainer()->get(LoggerInterface::class));
+
+        $this->assertNotNull($writer->getAdapter());
+        $this->assertNotNull($writer->getLogger());
+
+    }
 }

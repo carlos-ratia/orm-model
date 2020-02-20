@@ -13,7 +13,6 @@ use Cratia\ORM\DQL\Table;
 use Cratia\ORM\DQL\TableNull;
 use Cratia\ORM\Model\Common\ReflectionProperty;
 use Cratia\ORM\Model\Interfaces\IStrategyModelMapper;
-use Cratia\ORM\Model\Strategies;
 use Cratia\ORM\Model\Common\ReflectionModel;
 
 

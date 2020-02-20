@@ -10,11 +10,11 @@ use Cratia\ORM\DQL\Filter;
 use Cratia\ORM\DQL\FilterGroup;
 use Cratia\ORM\DQL\Interfaces\ISql;
 use Cratia\ORM\DQL\Sql;
-use Cratia\ORM\Model\Common\Functions;
 use Cratia\ORM\Model\Common\ReflectionModel;
 use Cratia\ORM\Model\Common\ReflectionProperty;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Cratia\ORM\Model\Interfaces\IStrategyModelWrite;
+use Cratia\ORM\Model\Strategies\ActiveRecord;
 use Cratia\Pipeline;
 use Doctrine\DBAL\DBALException;
 use Exception;
@@ -24,7 +24,7 @@ use ReflectionException;
 /**
  * Class ActiveRecordWrite
  */
-class ActiveRecordWrite implements IStrategyModelWrite
+class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
     //, ISubject
 {
 //    const EVENT_CREATE = "ActiveRecordWrite::CREATE";
@@ -34,80 +34,15 @@ class ActiveRecordWrite implements IStrategyModelWrite
 //    use SubjectTrait;
 
     /**
-     * @var IAdapter|null
-     */
-    private $adapter;
-
-    /**
-     * @var LoggerInterface|null
-     */
-    private $logger;
-
-    /**
      * ActiveRecordRead constructor.
      * @param IAdapter|null $adapter
      * @param LoggerInterface|null $logger
      */
     public function __construct(IAdapter $adapter = null, LoggerInterface $logger = null)
     {
-        $this->adapter = $adapter;
-        $this->logger = $logger;
+        parent::__construct($adapter,$logger);
 //        $this->attach(new StorageCacheObserver());
     }
-
-    /**
-     * @return IAdapter|null
-     */
-    public function getAdapter(): ?IAdapter
-    {
-        return $this->adapter;
-    }
-
-    /**
-     * @return LoggerInterface|null
-     */
-    public function getLogger(): ?LoggerInterface
-    {
-        return $this->logger;
-    }
-
-    /**
-     * @param IModel $model
-     * @return string
-     * @throws Exception
-     */
-    public function create(IModel $model): string
-    {
-        $result = Pipeline::try(
-            function () use ($model) {
-                $this->validateRequiredFields($model);
-            })
-            ->then(function () use ($model) {
-                $this->validateKeyFields($model);
-            })
-            ->then(function () use ($model) {
-                return $this->getFieldsToWrite($model);
-            })
-            ->then(function (array $fields) use ($model) {
-                return $this->createQueryToCreate($model, $fields);
-            })
-            ->then(function (ISql $sql) use ($model) {
-                return $this->executeQuery($model, self::CREATE, $sql);
-            })
-            ->catch(function (DBALException $e) {
-                throw $e;
-            })
-            ->catch(function (Exception $e) {
-                throw $e;
-            })
-        ();
-
-//        if ($result) {
-//            $this->notify(new Event(self::EVENT_CREATE, $model));
-//        }
-        return $result;
-    }
-
 
     /**
      * @param IModel $model
@@ -280,26 +215,80 @@ class ActiveRecordWrite implements IStrategyModelWrite
     }
 
     /**
-     * @param string $__METHOD__
      * @param IModel $model
-     * @param $time
-     * @return $this
+     * @param ReflectionProperty[] $fields
+     * @return ISql
+     * @throws Exception
      */
-    protected function logRunTime(IModel $model, string $__METHOD__, $time): self
+    public function createQueryToUpdate(IModel $model, array $fields): ISql
     {
-        if (!is_null($this->getLogger())) {
-            $get_class = get_class($model);
-            $run_time = Functions::pettyRunTime($time);
-            $memory = intval(memory_get_usage() / 1024 / 1024) . ' MB';
-            $message = "{$__METHOD__}({$get_class}...) -> [Runtime: {$run_time}, Memory: {$memory}]";
-            $this->getLogger()->info($message);
+        $sql_values = array_map(function (ReflectionProperty $property) {
+            return "`{$property->getName()}` = ?";
+        }, $fields);
+        $sql_values = implode(',', $sql_values);
+
+        $sql_params = array_map(function (ReflectionProperty $property) use ($model) {
+            return $model->{$property->getName()};
+        }, $fields);
+        $sql_params = array_values($sql_params);
+
+        $keys = $model->getKeys();
+        $where = FilterGroup::and();
+        foreach ($keys as $key) {
+            $where->add(
+                Filter::eq($model->getField($key), $model->{$key})
+            );
         }
-        return $this;
+
+        $sql = new Sql();
+        $sql->sentence = "UPDATE {$model->getFrom()->toSQL()->getSentence()} SET {$sql_values} WHERE {$where->toSQL()->getSentence()}";
+        $sql->params = array_merge($model->getFrom()->toSQL()->getParams(), $sql_params, $where->toSQL()->getParams());
+        return $sql;
+    }
+
+    /**
+     * @param IModel $model
+     * @return string
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function create(IModel $model): string
+    {
+        $result = Pipeline::try(
+            function () use ($model) {
+                $this->validateRequiredFields($model);
+            })
+            ->then(function () use ($model) {
+                $this->validateKeyFields($model);
+            })
+            ->then(function () use ($model) {
+                return $this->getFieldsToWrite($model);
+            })
+            ->then(function (array $fields) use ($model) {
+                return $this->createQueryToCreate($model, $fields);
+            })
+            ->then(function (ISql $sql) use ($model) {
+                return $this->executeQuery($model, self::CREATE, $sql);
+            })
+            ->catch(function (DBALException $e) {
+                throw $e;
+            })
+            ->catch(function (Exception $e) {
+                throw $e;
+            })
+        ();
+
+//        if ($result) {
+//            $this->notify(new Event(self::EVENT_CREATE, $model));
+//        }
+        return $result;
     }
 
     /**
      * @param IModel $model
      * @return bool
+     * @throws Exception
+     * @throws DBALException
      */
     public function update(IModel $model): bool
     {
@@ -331,38 +320,6 @@ class ActiveRecordWrite implements IStrategyModelWrite
 //            $this->notify(new Event(self::EVENT_UPDATE, $model));
 //        }
         return (bool)$result;
-    }
-
-    /**
-     * @param IModel $model
-     * @param ReflectionProperty[] $fields
-     * @return ISql
-     * @throws Exception
-     */
-    public function createQueryToUpdate(IModel $model, array $fields): ISql
-    {
-        $sql_values = array_map(function (ReflectionProperty $property) {
-            return "`{$property->getName()}` = ?";
-        }, $fields);
-        $sql_values = implode(',', $sql_values);
-
-        $sql_params = array_map(function (ReflectionProperty $property) use ($model) {
-            return $model->{$property->getName()};
-        }, $fields);
-        $sql_params = array_values($sql_params);
-
-        $keys = $model->getKeys();
-        $where = FilterGroup::and();
-        foreach ($keys as $key) {
-            $where->add(
-                Filter::eq($model->getField($key), $model->{$key})
-            );
-        }
-
-        $sql = new Sql();
-        $sql->sentence = "UPDATE {$model->getFrom()->toSQL()->getSentence()} SET {$sql_values} WHERE {$where->toSQL()->getSentence()}";
-        $sql->params = array_merge($model->getFrom()->toSQL()->getParams(), $sql_params, $where->toSQL()->getParams());
-        return $sql;
     }
 
 //    /**
