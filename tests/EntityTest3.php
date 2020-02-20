@@ -9,10 +9,10 @@ use Cratia\ORM\DQL\Table;
 use Cratia\ORM\Model\Model;
 
 /**
- * Class EntityTest2
+ * Class EntityTest3
  * @package Tests\Cratia\ORM\Model
  */
-class EntityTest2 extends Model
+class EntityTest3 extends Model
 {
     /**
      * @var int|null
@@ -36,14 +36,12 @@ class EntityTest2 extends Model
     private $id_connection;
 
     /**
-     * @var string
-     * @required
+     * @var string|null
      */
     private $error_exception;
 
-
     /**
-     * Entity constructor.
+     * EntityTest3 constructor.
      * @param int|null $id
      */
     public function __construct(int $id = null)
@@ -63,9 +61,9 @@ class EntityTest2 extends Model
 
     /**
      * @param int|null $id
-     * @return EntityTest2
+     * @return EntityTest3
      */
-    public function setId(?int $id): EntityTest2
+    public function setId(?int $id): EntityTest3
     {
         $this->id = $id;
         return $this;
@@ -81,9 +79,9 @@ class EntityTest2 extends Model
 
     /**
      * @param string $network_params
-     * @return EntityTest2
+     * @return EntityTest3
      */
-    public function setNetworkParams(string $network_params): EntityTest2
+    public function setNetworkParams(string $network_params): EntityTest3
     {
         $this->network_params = $network_params;
         return $this;
@@ -99,7 +97,7 @@ class EntityTest2 extends Model
 
     /**
      * @param mixed $network_service
-     * @return EntityTest2
+     * @return EntityTest3
      */
     public function setNetworkService($network_service)
     {
@@ -117,27 +115,27 @@ class EntityTest2 extends Model
 
     /**
      * @param int $id_connection
-     * @return EntityTest2
+     * @return EntityTest3
      */
-    public function setIdConnection(int $id_connection): EntityTest2
+    public function setIdConnection(int $id_connection): EntityTest3
     {
         $this->id_connection = $id_connection;
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getErrorException()
+    public function getErrorException(): ?string
     {
         return $this->error_exception;
     }
 
     /**
-     * @param mixed $error_exception
-     * @return EntityTest2
+     * @param string $error_exception
+     * @return EntityTest3
      */
-    public function setErrorException($error_exception)
+    public function setErrorException(string $error_exception): EntityTest3
     {
         $this->error_exception = $error_exception;
         return $this;

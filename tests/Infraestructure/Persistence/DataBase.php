@@ -61,4 +61,26 @@ class DataBase implements IAdapter
             ->executeQuery($sql, $params, $types)
             ->fetchAll(FetchMode::ASSOCIATIVE);
     }
+
+    /**
+     * @param string $sentence
+     * @param array $params
+     * @param array $types
+     * @return int
+     * @throws DBALException
+     */
+    public function nonQuery(string $sentence, array $params = [], array $types = []): int
+    {
+        $sentence = trim($sentence);
+        $affectedRows = $this->getConnection()->executeUpdate($sentence, $params, $types);
+        return $affectedRows;
+    }
+
+    /**
+     * @return string
+     */
+    public function lastInsertId(): string
+    {
+        return $this->getConnection()->lastInsertId();
+    }
 }

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Cratia\ORM\Model\Strategies\Mapper;
 
 
+use Cratia\ORM\DQL\Field;
+use Cratia\ORM\DQL\Interfaces\IField;
 use Cratia\ORM\DQL\Interfaces\IRelation;
 use Cratia\ORM\DQL\Interfaces\ITable;
 use Cratia\ORM\DQL\Table;
@@ -79,7 +81,7 @@ class MapperBase implements IStrategyModelMapper
     }
 
     /**
-     * @param  $model
+     * @param $model
      * @return array
      */
     public function getKeys($model)
@@ -94,5 +96,15 @@ class MapperBase implements IStrategyModelMapper
             }
         }
         return $keys;
+    }
+
+    /**
+     * @param $model
+     * @param $property
+     * @return IField
+     */
+    public function getField($model, $property): IField
+    {
+        return Field::column($this->getFrom($model), $property, $property);
     }
 }

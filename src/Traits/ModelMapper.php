@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Cratia\ORM\Model\Traits;
 
+use Cratia\ORM\DQL\Interfaces\IField;
 use Cratia\ORM\DQL\Interfaces\IRelation;
 use Cratia\ORM\DQL\Interfaces\ITable;
 use Cratia\ORM\Model\Interfaces\IStrategyModelMapper;
@@ -73,10 +74,20 @@ trait ModelMapper
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getKeys()
     {
         return $this->getStrategyToMapper()->getKeys($this);
     }
+
+    /**
+     * @param string $property
+     * @return IField
+     */
+    public function getField(string $property): IField
+    {
+        return $this->getStrategyToMapper()->getField($this, $property);
+    }
+
 }

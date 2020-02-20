@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Cratia\ORM\Model\Interfaces;
 
 
+use Cratia\ORM\DQL\Interfaces\IField;
 use Cratia\ORM\DQL\Interfaces\IRelation;
 use Cratia\ORM\DQL\Interfaces\ITable;
 
@@ -37,7 +38,13 @@ interface IModelMapper
     public function addRelation(IRelation $relation);
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getKeys();
+
+    /**
+     * @param string $property
+     * @return IField
+     */
+    public function getField(string $property): IField;
 }

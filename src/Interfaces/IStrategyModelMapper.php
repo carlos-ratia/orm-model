@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Cratia\ORM\Model\Interfaces;
 
 
+use Cratia\ORM\DQL\Interfaces\IField;
 use Cratia\ORM\DQL\Interfaces\IRelation;
 use Cratia\ORM\DQL\Interfaces\ITable;
 
@@ -45,4 +46,11 @@ interface IStrategyModelMapper
      * @return array
      */
     public function getKeys($model);
+
+    /**
+     * @param $model
+     * @param $property
+     * @return IField
+     */
+    public function getField($model, $property): IField;
 }

@@ -15,8 +15,8 @@ class ReflectionProperty extends \ReflectionProperty
 {
     const EXCLUDE_TO_RENDER = '@hidden';
     const ALLOW_UNDERSCORE = '@allow_underscore';
-    const AUTOINCREMENTAL = '@autoincremental';
-    const NOQUERYABLE = '@noqueryable';
+    const AUTO_INCREMENTAL = '@autoincremental';
+    const NO_QUERYABLE = '@noqueryable';
     const REQUIRED = '@required';
     const KEY = '@key';
 
@@ -87,6 +87,8 @@ class ReflectionProperty extends \ReflectionProperty
     {
         if ($this->getDocComment() === false) {
             return false;
+        } else if($this->isKey() && !$this->isAutoIncremental()) {
+            return true;
         } else {
             return strpos($this->getDocComment(), self::REQUIRED) !== false;
         }
@@ -100,7 +102,7 @@ class ReflectionProperty extends \ReflectionProperty
         if ($this->getDocComment() === false) {
             return false;
         } else {
-            return strpos($this->getDocComment(), self::AUTOINCREMENTAL) !== false;
+            return strpos($this->getDocComment(), self::AUTO_INCREMENTAL) !== false;
         }
     }
 
@@ -112,7 +114,7 @@ class ReflectionProperty extends \ReflectionProperty
         if ($this->getDocComment() === false) {
             return false;
         } else {
-            return strpos($this->getDocComment(), self::NOQUERYABLE) !== false;
+            return strpos($this->getDocComment(), self::NO_QUERYABLE) !== false;
         }
     }
 }

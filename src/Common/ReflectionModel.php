@@ -35,4 +35,16 @@ class ReflectionModel extends ReflectionClass
             return new ReflectionProperty($prop->class, $prop->name);
         }, $props);
     }
+
+    /**
+     * @param string $name
+     * @return ReflectionProperty|void
+     * @throws ReflectionException
+     */
+    public function getProperty($name)
+    {
+        $prop = parent::getProperty($name);
+        /** @var \ReflectionProperty $prop */
+        return new ReflectionProperty($prop->class, $prop->name);
+    }
 }

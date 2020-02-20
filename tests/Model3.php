@@ -6,6 +6,8 @@ namespace Tests\Cratia\ORM\Model;
 
 
 use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DQL\Interfaces\IField;
+use Cratia\ORM\DQL\Interfaces\IRelation;
 use Cratia\ORM\DQL\Interfaces\ITable;
 use Cratia\ORM\DQL\Table;
 use Cratia\ORM\Model\Interfaces\IModel;
@@ -14,6 +16,7 @@ use Cratia\ORM\Model\Interfaces\IStrategyModelRead;
 use Cratia\ORM\Model\Strategies\Access\AccessBase;
 use Cratia\ORM\Model\Traits\ModelAccess;
 use Cratia\ORM\Model\Traits\ModelReader;
+use Exception;
 use Psr\Log\LoggerInterface;
 
 
@@ -105,5 +108,44 @@ class Model3 implements IModelRead, IModel
             $this->getStrategyToRead()->inject($adapter, $logger);
         }
         return $this;
+    }
+
+    /**
+     * @param $from
+     * @return $this
+     * @throws Exception
+     */
+    public function setFrom($from)
+    {
+        throw new Exception("Not implemented.");
+    }
+
+    /**
+     * @return IRelation[]
+     * @throws Exception
+     */
+    public function getRelations()
+    {
+        throw new Exception("Not implemented.");
+    }
+
+    /**
+     * @param IRelation $relation
+     * @return $this
+     * @throws Exception
+     */
+    public function addRelation(IRelation $relation)
+    {
+        throw new Exception("Not implemented.");
+    }
+
+    /**
+     * @param string $property
+     * @return IField
+     * @throws Exception
+     */
+    public function getField(string $property): IField
+    {
+        throw new Exception("Not implemented.");
     }
 }
