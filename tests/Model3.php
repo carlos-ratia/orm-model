@@ -13,6 +13,7 @@ use Cratia\ORM\DQL\Table;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Cratia\ORM\Model\Interfaces\IModelRead;
 use Cratia\ORM\Model\Interfaces\IModelWriter;
+use Cratia\ORM\Model\Interfaces\IStrategyModelMapper;
 use Cratia\ORM\Model\Interfaces\IStrategyModelRead;
 use Cratia\ORM\Model\Strategies\Access\AccessBase;
 use Cratia\ORM\Model\Traits\ModelAccess;
@@ -221,5 +222,22 @@ class Model3 implements IModelRead, IModelWriter, IModel
     public function getField(string $property): IField
     {
         throw new Exception("Not implemented.");
+    }
+
+    /**
+     * @return IStrategyModelMapper|null
+     */
+    public function getStrategyToMapper(): ?IStrategyModelMapper
+    {
+        // TODO: Implement getStrategyToMapper() method.
+    }
+
+    /**
+     * @param IStrategyModelMapper $strategyToMapper
+     * @return IModel
+     */
+    public function setStrategyToMapper(IStrategyModelMapper $strategyToMapper)
+    {
+        // TODO: Implement setStrategyToMapper() method.
     }
 }

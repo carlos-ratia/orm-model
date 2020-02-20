@@ -21,9 +21,9 @@ trait ModelReader
     private $_strategyToRead = null;
 
     /**
-     * @return IStrategyModelRead
+     * @return IStrategyModelRead|null
      */
-    public function getStrategyToRead()
+    public function getStrategyToRead(): ?IStrategyModelRead
     {
         return $this->_strategyToRead;
     }
@@ -59,7 +59,7 @@ trait ModelReader
     /**
      * @return bool
      */
-    public function hasStrategyToRead()
+    public function hasStrategyToRead(): bool
     {
         if (is_null($this->getStrategyToRead())) {
             return false;

@@ -20,9 +20,9 @@ trait ModelWriter
     private $_strategyToWrite = null;
 
     /**
-     * @return IStrategyModelWrite
+     * @return IStrategyModelWrite|null
      */
-    public function getStrategyToWrite()
+    public function getStrategyToWrite(): ?IStrategyModelWrite
     {
         return $this->_strategyToWrite;
     }
@@ -53,7 +53,7 @@ trait ModelWriter
      * @throws Exception
      * @throws DBALException
      */
-    public function create()
+    public function create(): string
     {
         return $this->getStrategyToWrite()->create($this);
     }
@@ -63,7 +63,7 @@ trait ModelWriter
      * @throws Exception
      * @throws DBALException
      */
-    public function update()
+    public function update(): bool
     {
         return $this->getStrategyToWrite()->update($this);
     }

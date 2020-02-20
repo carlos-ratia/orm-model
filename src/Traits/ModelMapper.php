@@ -21,9 +21,9 @@ trait ModelMapper
     private $_strategyToMapper = null;
 
     /**
-     * @return IStrategyModelMapper
+     * @return IStrategyModelMapper|null
      */
-    public function getStrategyToMapper(): IStrategyModelMapper
+    public function getStrategyToMapper(): ?IStrategyModelMapper
     {
         return $this->_strategyToMapper;
     }

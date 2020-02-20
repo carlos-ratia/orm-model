@@ -11,6 +11,8 @@ use Cratia\ORM\DQL\Interfaces\IQuery;
 use Cratia\ORM\DQL\Interfaces\IRelation;
 use Cratia\ORM\DQL\Interfaces\ITable;
 use Cratia\ORM\Model\Collection;
+use Doctrine\DBAL\DBALException;
+use Exception;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -20,10 +22,24 @@ use Psr\Log\LoggerInterface;
 interface IModel
 {
     /**
+     * @param IAdapter $adapter
+     * @param LoggerInterface|null $logger
+     * @return IModel
+     */
+    public function inject(IAdapter $adapter, LoggerInterface $logger = null): IModel;
+
+    /**
      * @param $name
      * @return bool
      */
     public function __isset($name): bool;
+
+    /**
+     * @param $name
+     * @param $value
+     * @return $this
+     */
+    public function __set($name, $value);
 
     /**
      * @param $name
@@ -32,11 +48,31 @@ interface IModel
     public function __get($name);
 
     /**
-     * @param $name
-     * @param $value
-     * @return $this
+     * @return IStrategyModelAccess|null
      */
-    public function __set($name, $value);
+    public function getStrategyToAccess(): ?IStrategyModelAccess;
+
+    /**
+     * @param IStrategyModelAccess $strategyPropertyAccess
+     * @return IModel;
+     */
+    public function setStrategyToAccess(IStrategyModelAccess $strategyPropertyAccess);
+
+    /**
+     * @return bool
+     */
+    public function hasStrategyToAccess(): bool;
+
+    /**
+     * @return IStrategyModelMapper|null
+     */
+    public function getStrategyToMapper(): ?IStrategyModelMapper;
+
+    /**
+     * @param IStrategyModelMapper $strategyToMapper
+     * @return IModel
+     */
+    public function setStrategyToMapper(IStrategyModelMapper $strategyToMapper);
 
     /**
      * @param $from
@@ -56,7 +92,7 @@ interface IModel
 
     /**
      * @param IRelation $relation
-     * @return $this
+     * @return IModel
      */
     public function addRelation(IRelation $relation);
 
@@ -72,7 +108,18 @@ interface IModel
     public function getField(string $property): IField;
 
     /**
-     * @return $this
+     * @return IStrategyModelRead|null
+     */
+    public function getStrategyToRead(): ?IStrategyModelRead;
+
+    /**
+     * @param IStrategyModelRead $strategyReader
+     * @return IModel
+     */
+    public function setStrategyToRead(IStrategyModelRead $strategyReader);
+
+    /**
+     * @return IModel
      */
     public function load();
 
@@ -83,10 +130,38 @@ interface IModel
     public function read(IQuery $query): Collection;
 
     /**
-     * @param IAdapter $adapter
-     * @param LoggerInterface|null $logger
-     * @return IModel
+     * @return bool
      */
-    public function inject(IAdapter $adapter, LoggerInterface $logger = null): IModel;
+    public function hasStrategyToRead(): bool;
+
+    /**
+     * @return IStrategyModelWrite|null
+     */
+    public function getStrategyToWrite(): ?IStrategyModelWrite;
+
+    /**
+     * @param IStrategyModelWrite $strategyWriter
+     * @return $this
+     */
+    public function setStrategyToWrite(IStrategyModelWrite $strategyWriter);
+
+    /**
+     * @return bool
+     */
+    public function hasStrategyToWrite();
+
+    /**
+     * @return string
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function create(): string;
+
+    /**
+     * @return bool
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function update(): bool;
 
 }

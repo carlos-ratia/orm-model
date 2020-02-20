@@ -46,9 +46,9 @@ trait ModelAccess
     }
 
     /**
-     * @return IStrategyModelAccess
+     * @return IStrategyModelAccess|null
      */
-    public function getStrategyToAccess()
+    public function getStrategyToAccess(): ?IStrategyModelAccess
     {
         return $this->_strategyToAccess;
     }
@@ -57,7 +57,7 @@ trait ModelAccess
      * @param IStrategyModelAccess $strategyPropertyAccess
      * @return $this;
      */
-    public function setStrategyToAccess(IStrategyModelAccess $strategyPropertyAccess): self
+    public function setStrategyToAccess(IStrategyModelAccess $strategyPropertyAccess)
     {
         $this->_strategyToAccess = $strategyPropertyAccess;
         return $this;
@@ -66,7 +66,7 @@ trait ModelAccess
     /**
      * @return bool
      */
-    public function hasStrategyToAccess()
+    public function hasStrategyToAccess(): bool
     {
         if (is_null($this->getStrategyToAccess())) {
             return false;
