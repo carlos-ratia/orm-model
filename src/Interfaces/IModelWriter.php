@@ -3,6 +3,7 @@
 namespace Cratia\ORM\Model\Interfaces;
 
 
+use Cratia\ORM\DQL\Interfaces\IFilter;
 use Doctrine\DBAL\DBALException;
 use Exception;
 
@@ -25,4 +26,20 @@ interface IModelWriter
      * @throws DBALException
      */
     public function update(): bool;
+
+    /**
+     * @return bool
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function delete(): bool;
+
+    /**
+     * @param IFilter $filter
+     * @return bool
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function deleteBulk(IFilter $filter): bool;
+
 }

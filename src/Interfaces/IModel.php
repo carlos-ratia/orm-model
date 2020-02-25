@@ -7,10 +7,12 @@ namespace Cratia\ORM\Model\Interfaces;
 
 use Cratia\ORM\DBAL\Interfaces\IAdapter;
 use Cratia\ORM\DQL\Interfaces\IField;
+use Cratia\ORM\DQL\Interfaces\IFilter;
 use Cratia\ORM\DQL\Interfaces\IQuery;
 use Cratia\ORM\DQL\Interfaces\IRelation;
 use Cratia\ORM\DQL\Interfaces\ITable;
 use Cratia\ORM\Model\Collection;
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DBALException;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -24,9 +26,10 @@ interface IModel
     /**
      * @param IAdapter $adapter
      * @param LoggerInterface|null $logger
+     * @param EventManager|null $eventManager
      * @return IModel
      */
-    public function inject(IAdapter $adapter, LoggerInterface $logger = null): IModel;
+    public function inject(IAdapter $adapter, ?LoggerInterface $logger = null, ?EventManager $eventManager = null): IModel;
 
     /**
      * @param $name
@@ -164,4 +167,18 @@ interface IModel
      */
     public function update(): bool;
 
+    /**
+     * @return bool
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function delete(): bool;
+
+    /**
+     * @param IFilter $filter
+     * @return bool
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function deleteBulk(IFilter $filter): bool;
 }

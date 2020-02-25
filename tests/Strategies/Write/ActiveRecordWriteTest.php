@@ -170,4 +170,48 @@ class ActiveRecordWriteTest extends TestCase
         $this->assertNotNull($writer->getLogger());
 
     }
+
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     * @throws Exception
+     */
+    public function testDelete1()
+    {
+        $modelCreate = new EntityTest2();
+        $modelCreate->{'id_connection'} = 1;
+        $modelCreate->{'network_params'} = 'TEST';
+        $modelCreate->{'network_service'} = 'TEST';
+        $modelCreate->{'error_exception'} = 'TEST';
+
+        $write = new ActiveRecordWrite(
+            $this->getContainer()->get(IAdapter::class),
+            $this->getContainer()->get(LoggerInterface::class)
+        );
+
+        $id = $write->create($modelCreate);
+
+        $this->assertIsString($id);
+
+        $modelLoad = new EntityTest2(intval($id));
+        $reader = new ActiveRecordRead(
+            $this->getContainer()->get(IAdapter::class),
+            $this->getContainer()->get(LoggerInterface::class)
+        );
+        $reader->load($modelLoad);
+
+        $result = $write->delete($modelLoad);
+
+        $this->assertTrue($result);
+
+        $no_exist = false;
+
+        try {
+            $reader->load($modelLoad);
+        } catch (Exception $e) {
+            $no_exist = true;
+        }
+
+        $this->assertTrue($no_exist);
+    }
 }

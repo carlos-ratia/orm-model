@@ -103,7 +103,6 @@ class AccessBase implements IStrategyModelAccess
      */
     protected function underscoreToCamelCase($string)
     {
-        $str = str_replace('_', '', ucwords($string, '_'));
-        return $str;
+        return str_replace('_', '', ucwords($string, '_'));
     }
 }

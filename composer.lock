@@ -8,25 +8,28 @@
     "packages": [
         {
             "name": "cratia/orm-dbal",
-            "version": "0.4.2",
+            "version": "0.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carlos-ratia/orm-dbal.git",
-                "reference": "a38c79bafbe4d29a91a7c685d7ad78413a33e414"
+                "reference": "0b85f40d752f60d75edf1e173da1a813a8f02e54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carlos-ratia/orm-dbal/zipball/a38c79bafbe4d29a91a7c685d7ad78413a33e414",
-                "reference": "a38c79bafbe4d29a91a7c685d7ad78413a33e414",
+                "url": "https://api.github.com/repos/carlos-ratia/orm-dbal/zipball/0b85f40d752f60d75edf1e173da1a813a8f02e54",
+                "reference": "0b85f40d752f60d75edf1e173da1a813a8f02e54",
                 "shasum": ""
             },
             "require": {
                 "cratia/orm-dql": ">=0.1",
                 "cratia/pipeline": ">=0.7",
                 "doctrine/dbal": "^2.10",
-                "php": ">=7.1"
+                "ext-json": "*",
+                "php": ">=7.1",
+                "psr/log": "^1.1"
             },
             "require-dev": {
+                "monolog/monolog": "^2.0",
                 "phpunit/phpunit": "^9.0",
                 "symfony/dotenv": "^5.0"
             },
@@ -50,7 +53,7 @@
                 }
             ],
             "description": "Database abstraction layer (DBAL) for execute Query based on https://www.doctrine-project.org/projects/dbal.html",
-            "time": "2020-02-20T13:36:32+00:00"
+            "time": "2020-02-25T19:09:03+00:00"
         },
         {
             "name": "cratia/orm-dql",

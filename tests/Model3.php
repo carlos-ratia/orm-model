@@ -6,6 +6,7 @@ namespace Tests\Cratia\ORM\Model;
 
 
 use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DQL\Field;
 use Cratia\ORM\DQL\Interfaces\IField;
 use Cratia\ORM\DQL\Interfaces\IRelation;
 use Cratia\ORM\DQL\Interfaces\ITable;
@@ -19,6 +20,7 @@ use Cratia\ORM\Model\Strategies\Access\AccessBase;
 use Cratia\ORM\Model\Traits\ModelAccess;
 use Cratia\ORM\Model\Traits\ModelReader;
 use Cratia\ORM\Model\Traits\ModelWriter;
+use Doctrine\Common\EventManager;
 use Exception;
 use Psr\Log\LoggerInterface;
 
@@ -175,9 +177,10 @@ class Model3 implements IModelRead, IModelWriter, IModel
     /**
      * @param IAdapter $adapter
      * @param LoggerInterface|null $logger
+     * @param EventManager|null $eventManager
      * @return IModel
      */
-    public function inject(IAdapter $adapter, LoggerInterface $logger = null): IModel
+    public function inject(IAdapter $adapter, ?LoggerInterface $logger = null, ?EventManager $eventManager = null): IModel
     {
         if (!is_null($this->getStrategyToRead()) && ($this->getStrategyToRead() instanceof IStrategyModelRead)) {
             $this->getStrategyToRead()->inject($adapter, $logger);
@@ -221,7 +224,7 @@ class Model3 implements IModelRead, IModelWriter, IModel
      */
     public function getField(string $property): IField
     {
-        throw new Exception("Not implemented.");
+        return Field::column($this->getFrom(), $property, $property);
     }
 
     /**

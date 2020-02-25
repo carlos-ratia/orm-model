@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Cratia\ORM\Model\Traits;
 
+use Cratia\ORM\DQL\Interfaces\IFilter;
 use Cratia\ORM\Model\Interfaces\IStrategyModelWrite;
 use Doctrine\DBAL\DBALException;
 use Exception;
@@ -68,20 +69,23 @@ trait ModelWriter
         return $this->getStrategyToWrite()->update($this);
     }
 
-//    /**
-//     * @return bool
-//     */
-//    public function delete()
-//    {
-//        return $this->getStrategyToWrite()->delete($this);
-//    }
+    /**
+     * @return bool
+     * @throws DBALException
+     */
+    public function delete(): bool
+    {
+        return $this->getStrategyToWrite()->delete($this);
+    }
 
-//    /**
-//     * @param IFilter $filter
-//     * @return bool|mixed
-//     */
-//    public function deleteBulk(IFilter $filter)
-//    {
-//        return $this->getStrategyToWrite()->deleteBulk($this, $filter);
-//    }
+    /**
+     * @param IFilter $filter
+     * @return bool|mixed
+     * @throws DBALException
+     */
+    public function deleteBulk(IFilter $filter): bool
+    {
+        return $this->getStrategyToWrite()->deleteBulk($this, $filter);
+    }
+
 }

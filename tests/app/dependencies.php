@@ -32,7 +32,15 @@ return function (ContainerBuilder $containerBuilder) {
         },
 
         IAdapter::class => function () {
-            return new DataBase();
+            $connectionParams = array(
+                'dbname' => $_ENV['DB_NAME'],
+                'user' => $_ENV['DB_USER'],
+                'password' => $_ENV['DB_PASSWORD'],
+                'host' => $_ENV['DB_HOST'],
+                'driver' => 'pdo_mysql',
+                'charset' => $_ENV['DB_CHARSET']
+            );
+            return new \Cratia\ORM\DBAL\MysqlAdapter($connectionParams);
         }
     ]);
 };

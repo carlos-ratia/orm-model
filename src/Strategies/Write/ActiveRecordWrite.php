@@ -6,16 +6,23 @@ namespace Cratia\ORM\Model\Strategies\Read;
 
 
 use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Interfaces\IQueryDTO;
 use Cratia\ORM\DQL\Filter;
 use Cratia\ORM\DQL\FilterGroup;
+use Cratia\ORM\DQL\Interfaces\IFilter;
 use Cratia\ORM\DQL\Interfaces\ISql;
+use Cratia\ORM\DQL\Query;
 use Cratia\ORM\DQL\Sql;
 use Cratia\ORM\Model\Common\ReflectionModel;
 use Cratia\ORM\Model\Common\ReflectionProperty;
+use Cratia\ORM\Model\Events\EventErrorPayload;
+use Cratia\ORM\Model\Events\EventPayload;
+use Cratia\ORM\Model\Events\Events;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Cratia\ORM\Model\Interfaces\IStrategyModelWrite;
 use Cratia\ORM\Model\Strategies\ActiveRecord;
 use Cratia\Pipeline;
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DBALException;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -25,22 +32,17 @@ use ReflectionException;
  * Class ActiveRecordWrite
  */
 class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
-    //, ISubject
 {
-//    const EVENT_CREATE = "ActiveRecordWrite::CREATE";
-//    const EVENT_DELETE = "ActiveRecordWrite::DELETE";
-//    const EVENT_UPDATE = "ActiveRecordWrite::UPDATE";
-//
-//    use SubjectTrait;
 
     /**
      * ActiveRecordRead constructor.
      * @param IAdapter|null $adapter
      * @param LoggerInterface|null $logger
+     * @param EventManager|null $eventManager
      */
-    public function __construct(IAdapter $adapter = null, LoggerInterface $logger = null)
+    public function __construct(IAdapter $adapter = null, ?LoggerInterface $logger = null, ?EventManager $eventManager = null)
     {
-        parent::__construct($adapter,$logger);
+        parent::__construct($adapter, $logger, $eventManager);
 //        $this->attach(new StorageCacheObserver());
     }
 
@@ -200,23 +202,20 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
      * @param IModel $model
      * @param $king
      * @param ISql $sql
-     * @return int|string
+     * @return IQueryDTO
      * @throws DBALException
      */
     protected function executeQuery(IModel $model, $king, ISql $sql)
     {
         $time = -microtime(true);
         try {
-            $affectedRows = $this->getAdapter()->nonQuery($sql->getSentence(), $sql->getParams());
-            if ($king === self::CREATE) {
-                $affectedRows = $this->getAdapter()->lastInsertId();
-            }
+            $dto = $this->getQueryExecute()->executeNonQuery($king, $sql);
         } catch (Exception $e) {
             throw new DBALException($e->getMessage(), $e->getCode(), $e->getPrevious());
         }
         $time += microtime(true);
         $this->logRunTime($model, __METHOD__, $time);
-        return $affectedRows;
+        return $dto;
     }
 
     /**
@@ -263,6 +262,64 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
 
     /**
      * @param IModel $model
+     * @return ReflectionProperty[]
+     * @throws ReflectionException
+     */
+    protected function getFieldsToDelete(IModel $model): array
+    {
+        $result = [];
+        /** @var ReflectionModel $r */
+        $r = new ReflectionModel($model);
+        /** @var ReflectionProperty[] $properties */
+        $properties = $r->getProperties();
+        /** @var ReflectionProperty $property */
+        foreach ($properties as $property) {
+            if ($property->isKey()) {
+                $result[$property->getName()] = $property;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param IModel $model
+     * @param ReflectionProperty[] $fields
+     * @return ISql
+     * @throws Exception
+     */
+    public function createQueryToDelete(IModel $model, array $fields): ISql
+    {
+        $where = FilterGroup::and();
+        /** @var ReflectionProperty $field */
+        foreach ($fields as $field) {
+            $key = $field->getName();
+            if (is_bool($model->{$key})) {
+                $value = filter_var($model->{$key}, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+            } else {
+                $value = $model->{$key};
+            }
+            $where->add(
+                Filter::eq($model->getField($key), $value)
+            );
+        }
+        return $this->createQueryToDeleteByFilter($model, $where);
+    }
+
+    /**
+     * @param IModel $model
+     * @param IFilter $filter
+     * @return ISql
+     */
+    public function createQueryToDeleteByFilter(IModel $model, IFilter $filter): ISql
+    {
+        $sql = new Sql();
+        $sql->sentence = "DELETE {$model->getFrom()->getAs()} FROM {$model->getFrom()->toSQL()->getSentence()} WHERE {$filter->toSQL()->getSentence()}";
+        $sql->params = array_merge($model->getFrom()->toSQL()->getParams(), $filter->toSQL()->getParams());
+        return $sql;
+    }
+
+    /**
+     * @param IModel $model
      * @return string
      * @throws Exception
      * @throws DBALException
@@ -283,7 +340,22 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 return $this->createQueryToCreate($model, $fields);
             })
             ->then(function (ISql $sql) use ($model) {
-                return $this->executeQuery($model, self::CREATE, $sql);
+                return $this->executeQuery($model, IAdapter::CREATE, $sql);
+            })
+            ->tap(function (IQueryDTO $dto) use ($model) {
+                $this->notify(Events::ON_MODEL_CREATED, new EventPayload($model, new Query(), $dto));
+            })
+            ->then(function (IQueryDTO $dto) use ($model) {
+                return (string)$dto->getAffectedRows();
+            })
+            ->then(function (string $affectedRows) use ($model) {
+                return $affectedRows;
+            })
+            ->tapCatch(function (DBALException $e) use (&$model) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+            })
+            ->tapCatch(function (Exception $e) use (&$model) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
             })
             ->catch(function (DBALException $e) {
                 throw $e;
@@ -293,10 +365,7 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
             })
         ();
 
-//        if ($result) {
-//            $this->notify(new Event(self::EVENT_CREATE, $model));
-//        }
-        return $result;
+        return (string)$result;
     }
 
     /**
@@ -321,7 +390,22 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 return $this->createQueryToUpdate($model, $fields);
             })
             ->then(function (ISql $sql) use ($model) {
-                return $this->executeQuery($model, self::UPDATE, $sql);
+                return $this->executeQuery($model, IAdapter::UPDATE, $sql);
+            })
+            ->tap(function (IQueryDTO $dto) use ($model) {
+                $this->notify(Events::ON_MODEL_UPDATED, new EventPayload($model, new Query(), $dto));
+            })
+            ->then(function (IQueryDTO $dto) use ($model) {
+                return (bool)$dto->getAffectedRows();
+            })
+            ->then(function (bool $affectedRows) use ($model) {
+                return $affectedRows;
+            })
+            ->tapCatch(function (DBALException $e) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+            })
+            ->tapCatch(function (Exception $e) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
             })
             ->catch(function (DBALException $e) {
                 throw $e;
@@ -331,81 +415,90 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
             })
         ();
 
-//        if ($result) {
-//            $this->notify(new Event(self::EVENT_UPDATE, $model));
-//        }
         return (bool)$result;
     }
 
-//    /**
-//     * @param IModel|IModelAccess $model
-//     * @return bool
-//     * @throws Exception
-//     */
-//    public function delete($model)
-//    {
-//        $keys = $model->getKeys();
-//        $where = [];
-//        foreach ($keys as $key) {
-//            $where[$key] = $model->{$key};
-//        }
-//        $where_cond = implode(' AND ', array_map(function ($k) {
-//            return "$k = :$k";
-//        }, array_keys($where)));
-//
-//        $sql = "DELETE FROM {$model->getFrom()->getSource()} WHERE $where_cond";
-//        $result = $this->execute($sql, $where);
-//        if ($result) {
-//            $this->notify(new Event(self::EVENT_DELETE, $model));
-//        }
-//        return (bool)$result;
-//    }
+    /**
+     * @param IModel $model
+     * @return bool
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function delete(IModel $model): bool
+    {
+        $result = Pipeline::try(
+            function () use ($model) {
+                $this->validateKeyFields($model);
+            })
+            ->then(function () use ($model) {
+                return $this->getFieldsToDelete($model);
+            })
+            ->then(function (array $fields) use ($model) {
+                return $this->createQueryToDelete($model, $fields);
+            })
+            ->then(function (ISql $sql) use ($model) {
+                return $this->executeQuery($model, IAdapter::DELETE, $sql);
+            })
+            ->tap(function (IQueryDTO $dto) use ($model) {
+                $this->notify(Events::ON_MODEL_DELETED, new EventPayload($model, new Query(), $dto));
+            })
+            ->then(function (IQueryDTO $dto) use ($model) {
+                return (bool)$dto->getAffectedRows();
+            })
+            ->tapCatch(function (DBALException $e) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+            })
+            ->tapCatch(function (Exception $e) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+            })
+            ->catch(function (DBALException $e) {
+                throw $e;
+            })
+            ->catch(function (Exception $e) {
+                throw $e;
+            })
+        ();
 
-//    /**
-//     * @param IModel $model
-//     * @param IFilter $filter
-//     * @return bool|mixed
-//     * @throws Exception
-//     */
-//    public function deleteBulk($model, IFilter $filter)
-//    {
-//        $sql_params = [];
-//        /** @var IFilter $filter */
-//        $sql_where = $filter->getFilter();
-//        if ($filter->getFilterParams() !== false) {
-//            $sql_params = array_merge($sql_params, $filter->getFilterParams());
-//        }
-//
-//        $sql = "DELETE FROM {$model->getFrom()->getSource()} WHERE {$sql_where}";
-//        $result = $this->execute($sql, $sql_params);
-//        if ($result) {
-//            $this->notify(new Event(self::EVENT_DELETE, $model));
-//        }
-//        return (bool)$result;
-//    }
-//
-//
-//    public function getPerformance($sql = null, $sql_params = null)
-//    {
-//        $performance = new stdClass;
-//        if (!is_null($sql)) {
-//            $performance->sql = $this->formatSql($sql, $sql_params);
-//        }
-//        $performance->run_time = Functions::pettyRunTime($this->getRunTime());
-//        $performance->memmory = intval(memory_get_usage() / 1024 / 1024) . ' MB';
-//        $performance->system_load_average = sys_getloadavg();
-//        return $performance;
-//    }
-//
-//    protected function formatSql($sql, $params)
-//    {
-//        foreach ($params as $name => $value) {
-//            if ((DateTime::createFromFormat('Y-m-d G:i:s', $value) !== false) || // is datetime
-//                (!is_numeric($value))) {
-//                $value = "'$value'";
-//            }
-//            $sql = str_replace(':' . $name, $value, $sql);
-//        }
-//        return $sql;
-//    }
+        return (bool)$result;
+    }
+
+    /**
+     * @param IModel $model
+     * @param IFilter $filter
+     * @return bool
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function deleteBulk(IModel $model, IFilter $filter): bool
+    {
+        $result = Pipeline::try(
+            function () use ($filter, $model) {
+                return $this->createQueryToDeleteByFilter($model, $filter);
+            })
+            ->then(function (ISql $sql) use ($model) {
+                return $this->executeQuery($model, IAdapter::DELETE, $sql);
+            })
+            ->tap(function (IQueryDTO $dto) use ($model) {
+                $this->notify(Events::ON_MODEL_DELETED, new EventPayload($model, new Query(), $dto));
+            })
+            ->then(function (IQueryDTO $dto) use ($model) {
+                return (bool)$dto->getAffectedRows();
+            })
+            ->tapCatch(function (DBALException $e) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+            })
+            ->tapCatch(function (Exception $e) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+            })
+            ->catch(function (DBALException $e) {
+                throw $e;
+            })
+            ->catch(function (Exception $e) {
+                throw $e;
+            })
+        ();
+
+        return (bool)$result;
+    }
 }
+

@@ -17,6 +17,7 @@ use Cratia\ORM\Model\Traits\ModelAccess;
 use Cratia\ORM\Model\Traits\ModelMapper;
 use Cratia\ORM\Model\Traits\ModelReader;
 use Cratia\ORM\Model\Traits\ModelWriter;
+use Doctrine\Common\EventManager;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -44,9 +45,10 @@ abstract class Model implements IModel
     /**
      * @param IAdapter $adapter
      * @param LoggerInterface|null $logger
+     * @param EventManager|null $eventManager
      * @return $this
      */
-    public function inject(IAdapter $adapter, LoggerInterface $logger = null): IModel
+    public function inject(IAdapter $adapter, ?LoggerInterface $logger = null, ?EventManager $eventManager = null): IModel
     {
         if (!is_null($this->getStrategyToRead()) && ($this->getStrategyToRead() instanceof IStrategyModelRead)) {
             $this->getStrategyToRead()->inject($adapter, $logger);

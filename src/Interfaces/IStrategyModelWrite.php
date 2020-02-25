@@ -6,6 +6,8 @@ namespace Cratia\ORM\Model\Interfaces;
 
 
 use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DQL\Interfaces\IFilter;
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DBALException;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -16,15 +18,14 @@ use Psr\Log\LoggerInterface;
  */
 interface IStrategyModelWrite
 {
-    const CREATE = 'ActiveRecordWrite::CREATE';
-    const UPDATE = 'ActiveRecordWrite::UPDATE';
 
     /**
      * @param IAdapter $adapter
      * @param LoggerInterface|null $logger
+     * @param EventManager|null $eventManager
      * @return $this
      */
-    public function inject(IAdapter $adapter, LoggerInterface $logger = null);
+    public function inject(IAdapter $adapter, ?LoggerInterface $logger = null, ?EventManager $eventManager = null);
 
     /**
      * @param IModel $model
@@ -42,23 +43,21 @@ interface IStrategyModelWrite
      */
     public function update(IModel $model): bool;
 
-//    /**
-//     * Return the last inserted id in a create method
-//     *
-//     * @return int
-//     */
-//    public function getLastInsertedId();
-//
-//    /**
-//     * @param IModel $model
-//     * @return boolean
-//     */
-//    public function delete(IModel $model): bool;
-//
-//    /**
-//     * @param IModel $model
-//     * @param IFilter $filter
-//     * @return bool
-//     */
-//    public function deleteBulk($model, IFilter $filter): bool;
+    /**
+     * @param IModel $model
+     * @return bool
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function delete(IModel $model): bool;
+
+    /**
+     * @param $model
+     * @param IFilter $filter
+     * @return bool
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function deleteBulk(IModel $model, IFilter $filter): bool;
+
 }

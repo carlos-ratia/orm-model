@@ -140,6 +140,7 @@ class ModelWriterTest extends TestCase
 
         $result = $modelLoad->update();
 
+        $this->assertIsBool($result);
         $this->assertTrue($result);
 
         $modelLoad->load();
@@ -148,5 +149,45 @@ class ModelWriterTest extends TestCase
         $this->assertEquals('UPDATE', $modelLoad->{'network_params'});
         $this->assertEquals('UPDATE', $modelLoad->{'network_service'});
         $this->assertEquals('UPDATE', $modelLoad->{'error_exception'});
+    }
+
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     * @throws Exception
+     */
+    public function testDelete1()
+    {
+        $modelCreate = new Model3();
+        $modelCreate->{'id_connection'} = 1;
+        $modelCreate->{'network_params'} = 'TEST';
+        $modelCreate->{'network_service'} = 'TEST';
+        $modelCreate->{'error_exception'} = 'TEST';
+
+        $modelCreate->setStrategyToWrite(new ActiveRecordWrite(
+            $this->getContainer()->get(IAdapter::class),
+            $this->getContainer()->get(LoggerInterface::class)
+        ));
+
+        $id = $modelCreate->create();
+
+        $this->assertIsString($id);
+
+        $modelLoad = new Model3(intval($id));
+        $modelLoad->setStrategyToRead(new ActiveRecordRead(
+            $this->getContainer()->get(IAdapter::class),
+            $this->getContainer()->get(LoggerInterface::class)
+        ));
+        $modelLoad->setStrategyToWrite(new ActiveRecordWrite(
+            $this->getContainer()->get(IAdapter::class),
+            $this->getContainer()->get(LoggerInterface::class)
+        ));
+        $modelLoad->load();
+
+        $result = $modelLoad->delete();
+
+        $this->assertIsBool($result);
+        $this->assertTrue($result);
+
     }
 }

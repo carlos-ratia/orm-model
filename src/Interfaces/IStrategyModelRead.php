@@ -7,6 +7,7 @@ namespace Cratia\ORM\Model\Interfaces;
 use Cratia\ORM\DBAL\Interfaces\IAdapter;
 use Cratia\ORM\DQL\Interfaces\IQuery;
 use Cratia\ORM\Model\Collection;
+use Doctrine\Common\EventManager;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -31,7 +32,8 @@ interface IStrategyModelRead
     /**
      * @param IAdapter $adapter
      * @param LoggerInterface|null $logger
+     * @param EventManager|null $eventManager
      * @return $this
      */
-    public function inject(IAdapter $adapter, LoggerInterface $logger = null);
+    public function inject(IAdapter $adapter, ?LoggerInterface $logger = null, ?EventManager $eventManager = null);
 }

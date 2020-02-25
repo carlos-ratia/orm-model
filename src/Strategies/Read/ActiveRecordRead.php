@@ -7,17 +7,20 @@ namespace Cratia\ORM\Model\Strategies\Read;
 
 use Cratia\ORM\DBAL\Interfaces\IAdapter;
 use Cratia\ORM\DBAL\Interfaces\IQueryDTO;
-use Cratia\ORM\DBAL\QueryExecute;
 use Cratia\ORM\DQL\Field;
 use Cratia\ORM\DQL\Filter;
 use Cratia\ORM\DQL\GroupBy;
 use Cratia\ORM\DQL\Interfaces\IQuery;
 use Cratia\ORM\DQL\Query;
 use Cratia\ORM\Model\Collection;
+use Cratia\ORM\Model\Events\EventErrorPayload;
+use Cratia\ORM\Model\Events\EventPayload;
+use Cratia\ORM\Model\Events\Events;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Cratia\ORM\Model\Interfaces\IStrategyModelRead;
 use Cratia\ORM\Model\Strategies\ActiveRecord;
 use Cratia\Pipeline;
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DBALException;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -32,10 +35,11 @@ class ActiveRecordRead extends ActiveRecord implements IStrategyModelRead
      * ActiveRecordRead constructor.
      * @param IAdapter|null $adapter
      * @param LoggerInterface|null $logger
+     * @param EventManager|null $eventManager
      */
-    public function __construct(IAdapter $adapter = null, LoggerInterface $logger = null)
+    public function __construct(IAdapter $adapter = null, ?LoggerInterface $logger = null, ?EventManager $eventManager = null)
     {
-        parent::__construct($adapter, $logger);
+        parent::__construct($adapter, $logger, $eventManager);
     }
 
     /**
@@ -57,8 +61,17 @@ class ActiveRecordRead extends ActiveRecord implements IStrategyModelRead
             ->then(function (IQuery $query) use ($model) {
                 return $this->executeQueryToLoad($model, $query);
             })
+            ->tap(function (IQueryDTO $dto) use ($model) {
+                $this->notify(Events::ON_MODEL_LOADED, new EventPayload($model, new Query(), $dto));
+            })
             ->then(function (IQueryDTO $dto) use (&$model) {
                 return $this->setStateModelToLoad($model, $dto);
+            })
+            ->tapCatch(function (DBALException $e) use (&$model) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+            })
+            ->tapCatch(function (Exception $e) use (&$model) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
             })
             ->catch(function (DBALException $e) {
                 throw $e;
@@ -132,7 +145,7 @@ class ActiveRecordRead extends ActiveRecord implements IStrategyModelRead
     {
         $time = -microtime(true);
 
-        $dto = (new QueryExecute($this->getAdapter()))->execute($query);
+        $dto = $this->getQueryExecute()->executeQuery($query);
 
         $time += microtime(true);
         $this->logRunTime($model, __METHOD__, $time);
@@ -185,8 +198,17 @@ class ActiveRecordRead extends ActiveRecord implements IStrategyModelRead
             ->then(function (IQuery $query) use ($model) {
                 return $this->executeQueryToRead($model, $query);
             })
+            ->tap(function (IQueryDTO $dto) use ($query, $model) {
+                $this->notify(Events::ON_MODEL_READED, new EventPayload($model, $query, $dto));
+            })
             ->then(function (IQueryDTO $dto) use ($model) {
                 return $this->createCollectionToRead($model, $dto);
+            })
+            ->tapCatch(function (DBALException $e) use (&$model) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+            })
+            ->tapCatch(function (Exception $e) use (&$model) {
+                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
             })
             ->catch(function (DBALException $e) {
                 throw $e;
@@ -226,7 +248,7 @@ class ActiveRecordRead extends ActiveRecord implements IStrategyModelRead
     {
         $time = -microtime(true);
 
-        $dto = (new QueryExecute($this->getAdapter()))->execute($query);
+        $dto = $this->getQueryExecute()->executeQuery($query);
 
         $time += microtime(true);
         $this->logRunTime($model, __METHOD__, $time);
