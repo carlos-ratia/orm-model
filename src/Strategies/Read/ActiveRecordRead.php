@@ -199,7 +199,7 @@ class ActiveRecordRead extends ActiveRecord implements IStrategyModelRead
                 return $this->executeQueryToRead($model, $query);
             })
             ->tap(function (IQueryDTO $dto) use ($query, $model) {
-                $this->notify(Events::ON_MODEL_READED, new EventPayload($model, $query, $dto));
+                $this->notify(Events::ON_MODEL_READE, new EventPayload($model, $query, $dto));
             })
             ->then(function (IQueryDTO $dto) use ($model) {
                 return $this->createCollectionToRead($model, $dto);

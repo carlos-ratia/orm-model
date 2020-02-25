@@ -11,11 +11,13 @@ use Cratia\ORM\Model\Strategies\Read\ActiveRecordRead;
 use Cratia\ORM\Model\Strategies\Read\ActiveRecordWrite;
 use DI\DependencyException;
 use DI\NotFoundException;
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DBALException;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Tests\Cratia\ORM\Model\EntityTest2;
 use Tests\Cratia\ORM\Model\EntityTest3;
+use Tests\Cratia\ORM\Model\EventSubscriberActiveRecord;
 use Tests\Cratia\ORM\Model\Model3;
 use Tests\Cratia\ORM\Model\TestCase;
 
@@ -291,6 +293,61 @@ class ModelWriterTest extends TestCase
         );
         $result = $model->deleteBulk(Filter::eq($model->getField('disabled'), true));
         $this->assertIsBool($result);
+    }
+
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     * @throws Exception
+     */
+    public function testDelete4()
+    {
+        $subscriber = new EventSubscriberActiveRecord();
+
+        $this->assertFalse($subscriber->onError);
+        $this->assertFalse($subscriber->onModelCreated);
+        $this->assertFalse($subscriber->onModelUpdated);
+        $this->assertFalse($subscriber->onModelDeleted);
+        $this->assertFalse($subscriber->onModelLoaded);
+        $this->assertFalse($subscriber->onModelReade);
+
+        $eventManager = $this->getContainer()->get(EventManager::class);
+        $eventManager->addEventSubscriber($subscriber);
+
+        $modelCreate = new EntityTest3();
+        $modelCreate->inject(
+            $this->getContainer()->get(IAdapter::class),
+            $this->getContainer()->get(LoggerInterface::class),
+            $eventManager
+        );
+        $modelCreate->{'id_connection'} = 1;
+        $modelCreate->{'network_params'} = 'TEST';
+        $modelCreate->{'network_service'} = 'TEST';
+        $modelCreate->{'error_exception'} = 'TEST';
+
+        $id = $modelCreate->create();
+
+        $this->assertIsString($id);
+
+        $modelLoad = new EntityTest3(intval($id));
+        $modelLoad->inject(
+            $this->getContainer()->get(IAdapter::class),
+            $this->getContainer()->get(LoggerInterface::class),
+            $eventManager
+        );
+
+        $modelLoad->load();
+        $result = $modelLoad->delete();
+        $this->assertIsBool($result);
+        $this->assertTrue($result);
+
+        $this->assertFalse($subscriber->onError);
+        $this->assertTrue($subscriber->onModelCreated);
+        $this->assertFalse($subscriber->onModelUpdated);
+        $this->assertTrue($subscriber->onModelDeleted);
+        $this->assertTrue($subscriber->onModelLoaded);
+        $this->assertFalse($subscriber->onModelReade);
+
     }
 
 }

@@ -19,10 +19,10 @@ final class Events
 
     public const ON_ERROR = 'onError';
 
-    public const ON_MODEL_LOADED = 'onAfterExecuteQuery';
-    public const ON_MODEL_READED = 'onBeforeExecuteQuery';
+    public const ON_MODEL_LOADED = 'onModelLoaded';
+    public const ON_MODEL_READE = 'onModelReade';
 
-    public const ON_MODEL_CREATED = 'onAfterExecuteNonQuery';
-    public const ON_MODEL_UPDATED = 'onBeforeExecuteNonQuery';
-    public const ON_MODEL_DELETED = 'onBeforeExecuteNonQuery';
+    public const ON_MODEL_CREATED = 'onModelCreated';
+    public const ON_MODEL_UPDATED = 'onModelUpdated';
+    public const ON_MODEL_DELETED = 'onModelDeleted';
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Cratia\ORM\DBAL\Interfaces\IAdapter;
 use DI\ContainerBuilder;
+use Doctrine\Common\EventManager;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\IntrospectionProcessor;
@@ -41,6 +42,10 @@ return function (ContainerBuilder $containerBuilder) {
                 'charset' => $_ENV['DB_CHARSET']
             );
             return new \Cratia\ORM\DBAL\MysqlAdapter($connectionParams);
+        },
+
+        EventManager::class => function () {
+            return new EventManager();
         }
     ]);
 };

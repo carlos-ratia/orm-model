@@ -51,10 +51,10 @@ abstract class Model implements IModel
     public function inject(IAdapter $adapter, ?LoggerInterface $logger = null, ?EventManager $eventManager = null): IModel
     {
         if (!is_null($this->getStrategyToRead()) && ($this->getStrategyToRead() instanceof IStrategyModelRead)) {
-            $this->getStrategyToRead()->inject($adapter, $logger);
+            $this->getStrategyToRead()->inject($adapter, $logger, $eventManager);
         }
         if (!is_null($this->getStrategyToWrite()) && ($this->getStrategyToWrite() instanceof IStrategyModelWrite)) {
-            $this->getStrategyToWrite()->inject($adapter, $logger);
+            $this->getStrategyToWrite()->inject($adapter, $logger, $eventManager);
         }
         return $this;
     }
