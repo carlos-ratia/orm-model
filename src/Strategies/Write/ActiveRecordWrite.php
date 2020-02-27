@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Cratia\ORM\Model\Strategies\Read;
 
 
-use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
 use Cratia\ORM\DBAL\Interfaces\IQueryDTO;
 use Cratia\ORM\DQL\Filter;
 use Cratia\ORM\DQL\FilterGroup;
@@ -346,7 +346,7 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 $this->notify(Events::ON_MODEL_CREATED, new EventPayload($model, new Query(), $dto));
             })
             ->then(function (IQueryDTO $dto) use ($model) {
-                return (string)$dto->getAffectedRows();
+                return (string)$dto->getResult();
             })
             ->then(function (string $affectedRows) use ($model) {
                 return $affectedRows;
@@ -396,7 +396,7 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 $this->notify(Events::ON_MODEL_UPDATED, new EventPayload($model, new Query(), $dto));
             })
             ->then(function (IQueryDTO $dto) use ($model) {
-                return (bool)$dto->getAffectedRows();
+                return (bool)$dto->getResult();
             })
             ->then(function (bool $affectedRows) use ($model) {
                 return $affectedRows;
@@ -443,7 +443,7 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 $this->notify(Events::ON_MODEL_DELETED, new EventPayload($model, new Query(), $dto));
             })
             ->then(function (IQueryDTO $dto) use ($model) {
-                return (bool)$dto->getAffectedRows();
+                return (bool)$dto->getResult();
             })
             ->tapCatch(function (DBALException $e) {
                 $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
@@ -482,7 +482,7 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 $this->notify(Events::ON_MODEL_DELETED, new EventPayload($model, new Query(), $dto));
             })
             ->then(function (IQueryDTO $dto) use ($model) {
-                return (bool)$dto->getAffectedRows();
+                return (bool)$dto->getResult();
             })
             ->tapCatch(function (DBALException $e) {
                 $this->notify(Events::ON_ERROR, new EventErrorPayload($e));

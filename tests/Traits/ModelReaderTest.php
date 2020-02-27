@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Cratia\ORM\Model\Traits;
 
 
-use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
 use Cratia\ORM\DQL\Field;
 use Cratia\ORM\DQL\Interfaces\ISql;
 use Cratia\ORM\DQL\Query;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Cratia\ORM\Model\Strategies\Read;
 
 
-use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
 use Cratia\ORM\DBAL\Interfaces\IQueryDTO;
 use Cratia\ORM\DQL\Field;
 use Cratia\ORM\DQL\Filter;
@@ -199,7 +199,7 @@ class ActiveRecordRead extends ActiveRecord implements IStrategyModelRead
                 return $this->executeQueryToRead($model, $query);
             })
             ->tap(function (IQueryDTO $dto) use ($query, $model) {
-                $this->notify(Events::ON_MODEL_READE, new EventPayload($model, $query, $dto));
+                $this->notify(Events::ON_MODEL_READ, new EventPayload($model, $query, $dto));
             })
             ->then(function (IQueryDTO $dto) use ($model) {
                 return $this->createCollectionToRead($model, $dto);
@@ -263,6 +263,6 @@ class ActiveRecordRead extends ActiveRecord implements IStrategyModelRead
      */
     protected function createCollectionToRead(IModel $model, IQueryDTO $dto): Collection
     {
-        return new Collection($model, $dto->getFound(), $dto->getSql(), $dto->getRows());
+        return new Collection($model, $dto->getResult(), $dto->getSql(), $dto->getRows());
     }
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Cratia\ORM\Model;
 
 
-use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
 use DI\DependencyException;
 use DI\NotFoundException;
 use Exception;

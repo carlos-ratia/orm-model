@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Cratia\ORM\Model\Interfaces;
 
-use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
 use Cratia\ORM\DQL\Interfaces\IQuery;
 use Cratia\ORM\Model\Collection;
 use Doctrine\Common\EventManager;

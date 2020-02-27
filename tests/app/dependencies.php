@@ -2,7 +2,8 @@
 declare(strict_types=1);
 
 
-use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Adapter\MysqlAdapter;
 use DI\ContainerBuilder;
 use Doctrine\Common\EventManager;
 use Monolog\Handler\StreamHandler;
@@ -12,7 +13,7 @@ use Monolog\Processor\MemoryUsageProcessor;
 use Monolog\Processor\UidProcessor;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Tests\Cratia\ORM\Model\Infraestructure\Persistence\DataBase;
+
 
 return function (ContainerBuilder $containerBuilder) {
     $containerBuilder->addDefinitions([
@@ -41,7 +42,7 @@ return function (ContainerBuilder $containerBuilder) {
                 'driver' => 'pdo_mysql',
                 'charset' => $_ENV['DB_CHARSET']
             );
-            return new \Cratia\ORM\DBAL\MysqlAdapter($connectionParams);
+            return new MysqlAdapter($connectionParams);
         },
 
         EventManager::class => function () {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Cratia\ORM\Model\Strategies;
 
-use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
 use Cratia\ORM\DBAL\QueryExecute;
 use Cratia\ORM\Model\Common\Functions;
 use Cratia\ORM\Model\Interfaces\IModel;

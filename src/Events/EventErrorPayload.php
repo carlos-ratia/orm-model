@@ -16,21 +16,21 @@ use Exception;
 class EventErrorPayload extends EventArgs
 {
     /**
-     * @var DBALException|Exception|null
+     * @var DBALException|Exception
      */
     private $exception;
 
     /**
      * EventPayload constructor.
-     * @param Exception|null $e
+     * @param DBALException|Exception $e
      */
-    public function __construct(Exception $e = null)
+    public function __construct($e)
     {
         $this->exception = $e;
     }
 
     /**
-     * @return DBALException|Exception|null
+     * @return DBALException|Exception
      */
     public function getException()
     {

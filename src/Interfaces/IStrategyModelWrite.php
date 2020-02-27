@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Cratia\ORM\Model\Interfaces;
 
 
-use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
 use Cratia\ORM\DQL\Interfaces\IFilter;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\DBALException;

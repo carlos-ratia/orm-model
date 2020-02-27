@@ -6,7 +6,8 @@
         "phpunit/phpunit": "^9.0",
         "monolog/monolog": "^2.0",
         "php-di/php-di": "^6.0",
-        "symfony/dotenv": "^5.0"
+        "symfony/dotenv": "^5.0",
+        "cratia/adapter-mysql": ">=0.2"
     },
     "license": "MIT",
     "authors": [

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Cratia\ORM\Model;
 
 
-use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Cratia\ORM\Model\Interfaces\IStrategyModelRead;
 use Cratia\ORM\Model\Interfaces\IStrategyModelWrite;

@@ -38,7 +38,7 @@ class EventSubscriberActiveRecord implements EventSubscriber
     }
 
 
-    public function onError(EventErrorPayload $event)
+    public function onModelError(EventErrorPayload $event)
     {
         $this->onError = true;
     }
@@ -80,7 +80,7 @@ class EventSubscriberActiveRecord implements EventSubscriber
                 Events::ON_MODEL_UPDATED,
                 Events::ON_MODEL_DELETED,
                 Events::ON_MODEL_LOADED,
-                Events::ON_MODEL_READE,
+                Events::ON_MODEL_READ,
             ];
     }
 }

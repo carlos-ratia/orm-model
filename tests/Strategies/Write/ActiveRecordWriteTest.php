@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Cratia\ORM\Model\Strategies\Write;
 
 
-use Cratia\ORM\DBAL\Interfaces\IAdapter;
+use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
 use Cratia\ORM\Model\Strategies\Read\ActiveRecordRead;
 use Cratia\ORM\Model\Strategies\Read\ActiveRecordWrite;
 use DI\DependencyException;
