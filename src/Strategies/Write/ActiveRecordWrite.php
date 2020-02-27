@@ -15,8 +15,8 @@ use Cratia\ORM\DQL\Query;
 use Cratia\ORM\DQL\Sql;
 use Cratia\ORM\Model\Common\ReflectionModel;
 use Cratia\ORM\Model\Common\ReflectionProperty;
-use Cratia\ORM\Model\Events\EventErrorPayload;
-use Cratia\ORM\Model\Events\EventPayload;
+use Cratia\ORM\Model\Events\Payloads\EventModelErrorPayload;
+use Cratia\ORM\Model\Events\Payloads\EventModelPayload;
 use Cratia\ORM\Model\Events\Events;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Cratia\ORM\Model\Interfaces\IStrategyModelWrite;
@@ -343,7 +343,7 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 return $this->executeQuery($model, IAdapter::CREATE, $sql);
             })
             ->tap(function (IQueryDTO $dto) use ($model) {
-                $this->notify(Events::ON_MODEL_CREATED, new EventPayload($model, new Query(), $dto));
+                $this->notify(Events::ON_MODEL_CREATED, new EventModelPayload($model, new Query(), $dto));
             })
             ->then(function (IQueryDTO $dto) use ($model) {
                 return (string)$dto->getResult();
@@ -352,10 +352,10 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 return $affectedRows;
             })
             ->tapCatch(function (DBALException $e) use (&$model) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->tapCatch(function (Exception $e) use (&$model) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->catch(function (DBALException $e) {
                 throw $e;
@@ -393,7 +393,7 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 return $this->executeQuery($model, IAdapter::UPDATE, $sql);
             })
             ->tap(function (IQueryDTO $dto) use ($model) {
-                $this->notify(Events::ON_MODEL_UPDATED, new EventPayload($model, new Query(), $dto));
+                $this->notify(Events::ON_MODEL_UPDATED, new EventModelPayload($model, new Query(), $dto));
             })
             ->then(function (IQueryDTO $dto) use ($model) {
                 return (bool)$dto->getResult();
@@ -402,10 +402,10 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 return $affectedRows;
             })
             ->tapCatch(function (DBALException $e) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->tapCatch(function (Exception $e) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->catch(function (DBALException $e) {
                 throw $e;
@@ -440,16 +440,16 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 return $this->executeQuery($model, IAdapter::DELETE, $sql);
             })
             ->tap(function (IQueryDTO $dto) use ($model) {
-                $this->notify(Events::ON_MODEL_DELETED, new EventPayload($model, new Query(), $dto));
+                $this->notify(Events::ON_MODEL_DELETED, new EventModelPayload($model, new Query(), $dto));
             })
             ->then(function (IQueryDTO $dto) use ($model) {
                 return (bool)$dto->getResult();
             })
             ->tapCatch(function (DBALException $e) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->tapCatch(function (Exception $e) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->catch(function (DBALException $e) {
                 throw $e;
@@ -479,16 +479,16 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
                 return $this->executeQuery($model, IAdapter::DELETE, $sql);
             })
             ->tap(function (IQueryDTO $dto) use ($model) {
-                $this->notify(Events::ON_MODEL_DELETED, new EventPayload($model, new Query(), $dto));
+                $this->notify(Events::ON_MODEL_DELETED, new EventModelPayload($model, new Query(), $dto));
             })
             ->then(function (IQueryDTO $dto) use ($model) {
                 return (bool)$dto->getResult();
             })
             ->tapCatch(function (DBALException $e) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->tapCatch(function (Exception $e) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->catch(function (DBALException $e) {
                 throw $e;

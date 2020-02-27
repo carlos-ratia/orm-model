@@ -13,8 +13,8 @@ use Cratia\ORM\DQL\GroupBy;
 use Cratia\ORM\DQL\Interfaces\IQuery;
 use Cratia\ORM\DQL\Query;
 use Cratia\ORM\Model\Collection;
-use Cratia\ORM\Model\Events\EventErrorPayload;
-use Cratia\ORM\Model\Events\EventPayload;
+use Cratia\ORM\Model\Events\Payloads\EventModelErrorPayload;
+use Cratia\ORM\Model\Events\Payloads\EventModelPayload;
 use Cratia\ORM\Model\Events\Events;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Cratia\ORM\Model\Interfaces\IStrategyModelRead;
@@ -62,16 +62,16 @@ class ActiveRecordRead extends ActiveRecord implements IStrategyModelRead
                 return $this->executeQueryToLoad($model, $query);
             })
             ->tap(function (IQueryDTO $dto) use ($model) {
-                $this->notify(Events::ON_MODEL_LOADED, new EventPayload($model, new Query(), $dto));
+                $this->notify(Events::ON_MODEL_LOADED, new EventModelPayload($model, new Query(), $dto));
             })
             ->then(function (IQueryDTO $dto) use (&$model) {
                 return $this->setStateModelToLoad($model, $dto);
             })
             ->tapCatch(function (DBALException $e) use (&$model) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->tapCatch(function (Exception $e) use (&$model) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->catch(function (DBALException $e) {
                 throw $e;
@@ -199,16 +199,16 @@ class ActiveRecordRead extends ActiveRecord implements IStrategyModelRead
                 return $this->executeQueryToRead($model, $query);
             })
             ->tap(function (IQueryDTO $dto) use ($query, $model) {
-                $this->notify(Events::ON_MODEL_READ, new EventPayload($model, $query, $dto));
+                $this->notify(Events::ON_MODEL_READ, new EventModelPayload($model, $query, $dto));
             })
             ->then(function (IQueryDTO $dto) use ($model) {
                 return $this->createCollectionToRead($model, $dto);
             })
             ->tapCatch(function (DBALException $e) use (&$model) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->tapCatch(function (Exception $e) use (&$model) {
-                $this->notify(Events::ON_ERROR, new EventErrorPayload($e));
+                $this->notify(Events::ON_ERROR, new EventModelErrorPayload($e));
             })
             ->catch(function (DBALException $e) {
                 throw $e;

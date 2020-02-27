@@ -2,18 +2,19 @@
 declare(strict_types=1);
 
 
-namespace Cratia\ORM\Model\Events;
+namespace Cratia\ORM\Model\Events\Payloads;
 
 
 use Doctrine\Common\EventArgs;
 use Doctrine\DBAL\DBALException;
 use Exception;
+use JsonSerializable;
 
 /**
- * Class EventErrorPayload
+ * Class EventModelErrorPayload
  * @package Cratia\ORM\Model\Events
  */
-class EventErrorPayload extends EventArgs
+class EventModelErrorPayload extends EventArgs implements JsonSerializable
 {
     /**
      * @var DBALException|Exception
@@ -37,4 +38,11 @@ class EventErrorPayload extends EventArgs
         return $this->exception;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return ['exception' => $this->getException()];
+    }
 }

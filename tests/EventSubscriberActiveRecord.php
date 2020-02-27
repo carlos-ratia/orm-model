@@ -6,8 +6,8 @@ namespace Tests\Cratia\ORM\Model;
 
 
 
-use Cratia\ORM\Model\Events\EventErrorPayload;
-use Cratia\ORM\Model\Events\EventPayload;
+use Cratia\ORM\Model\Events\Payloads\EventModelErrorPayload;
+use Cratia\ORM\Model\Events\Payloads\EventModelPayload;
 use Cratia\ORM\Model\Events\Events;
 use Doctrine\Common\EventSubscriber;
 
@@ -38,32 +38,32 @@ class EventSubscriberActiveRecord implements EventSubscriber
     }
 
 
-    public function onModelError(EventErrorPayload $event)
+    public function onModelError(EventModelErrorPayload $event)
     {
         $this->onError = true;
     }
 
-    public function onModelLoaded(EventPayload $event)
+    public function onModelLoaded(EventModelPayload $event)
     {
         $this->onModelLoaded = true;
     }
 
-    public function onModelReade(EventPayload $event)
+    public function onModelReade(EventModelPayload $event)
     {
         $this->onModelReade = true;
     }
 
-    public function onModelCreated(EventPayload $event)
+    public function onModelCreated(EventModelPayload $event)
     {
         $this->onModelCreated = true;
     }
 
-    public function onModelUpdated(EventPayload $event)
+    public function onModelUpdated(EventModelPayload $event)
     {
         $this->onModelUpdated = true;
     }
 
-    public function onModelDeleted(EventPayload $event)
+    public function onModelDeleted(EventModelPayload $event)
     {
         $this->onModelDeleted = true;
     }

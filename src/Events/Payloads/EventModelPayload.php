@@ -2,19 +2,20 @@
 declare(strict_types=1);
 
 
-namespace Cratia\ORM\Model\Events;
+namespace Cratia\ORM\Model\Events\Payloads;
 
 
 use Cratia\ORM\DBAL\Interfaces\IQueryDTO;
 use Cratia\ORM\DQL\Interfaces\IQuery;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Doctrine\Common\EventArgs;
+use JsonSerializable;
 
 /**
- * Class EventPayload
+ * Class EventModelPayload
  * @package Cratia\ORM\Model\Events
  */
-class EventPayload extends EventArgs
+class EventModelPayload extends EventArgs implements JsonSerializable
 {
 
     /**
@@ -67,5 +68,13 @@ class EventPayload extends EventArgs
     public function getDto(): IQueryDTO
     {
         return $this->dto;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return ['dto' => $this->getDto()];
     }
 }
