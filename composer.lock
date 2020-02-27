@@ -130,16 +130,16 @@
         },
         {
             "name": "cratia/orm-dbal",
-            "version": "0.4.6",
+            "version": "0.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carlos-ratia/orm-dbal.git",
-                "reference": "e8659e15efda55c6ed490d4d747418a535ecb333"
+                "reference": "2bd63b39dff2ecc3112e7b412e0e6ce239c60c36"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carlos-ratia/orm-dbal/zipball/e8659e15efda55c6ed490d4d747418a535ecb333",
-                "reference": "e8659e15efda55c6ed490d4d747418a535ecb333",
+                "url": "https://api.github.com/repos/carlos-ratia/orm-dbal/zipball/2bd63b39dff2ecc3112e7b412e0e6ce239c60c36",
+                "reference": "2bd63b39dff2ecc3112e7b412e0e6ce239c60c36",
                 "shasum": ""
             },
             "require": {
@@ -179,7 +179,7 @@
                 }
             ],
             "description": "Database abstraction layer (DBAL) for execute Query based on https://www.doctrine-project.org/projects/dbal.html",
-            "time": "2020-02-27T21:20:15+00:00"
+            "time": "2020-02-27T22:08:35+00:00"
         },
         {
             "name": "cratia/orm-dql",
@@ -634,16 +634,16 @@
     "packages-dev": [
         {
             "name": "cratia/adapter-mysql",
-            "version": "0.2.4",
+            "version": "0.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carlos-ratia/adapter-mysql.git",
-                "reference": "1cc930ade7c6543c5d02b171056264a56ab39a89"
+                "reference": "91351a78aeffb1977472e8865d65108b3a1f8ea9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carlos-ratia/adapter-mysql/zipball/1cc930ade7c6543c5d02b171056264a56ab39a89",
-                "reference": "1cc930ade7c6543c5d02b171056264a56ab39a89",
+                "url": "https://api.github.com/repos/carlos-ratia/adapter-mysql/zipball/91351a78aeffb1977472e8865d65108b3a1f8ea9",
+                "reference": "91351a78aeffb1977472e8865d65108b3a1f8ea9",
                 "shasum": ""
             },
             "require": {
@@ -674,7 +674,7 @@
                 }
             ],
             "description": "Implementation over abstraction IAdapter for creating and execution Doctrine\\DBAL\\Connection instances over driver Mysql",
-            "time": "2020-02-27T21:14:43+00:00"
+            "time": "2020-02-27T22:06:38+00:00"
         },
         {
             "name": "doctrine/instantiator",
