@@ -24,7 +24,8 @@
         "cratia/orm-dbal": ">=0.4",
         "cratia/pipeline": ">=0.7",
         "psr/log": "^1.1",
-        "ext-json": "*"
+        "ext-json": "*",
+        "cratia/common-functions": ">=0.1"
     },
     "autoload": {
         "classmap": [

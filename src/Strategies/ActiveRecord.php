@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Cratia\ORM\Model\Strategies;
 
+use Cratia\Common\Functions;
 use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
 use Cratia\ORM\DBAL\QueryExecute;
-use Cratia\ORM\Model\Common\Functions;
 use Cratia\ORM\Model\Interfaces\IModel;
 use Doctrine\Common\EventArgs;
 use Doctrine\Common\EventManager;

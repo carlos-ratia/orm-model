@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4c871a219b24a75e30e78b5256f4a13e",
+    "content-hash": "176b11fe5a3ed005e715d75d2d60fa33",
     "packages": [
         {
             "name": "cratia/adapter-sql-performance",
