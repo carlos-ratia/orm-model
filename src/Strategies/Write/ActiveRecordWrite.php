@@ -8,11 +8,14 @@ namespace Cratia\ORM\Model\Strategies\Read;
 use Cratia\ORM\DBAL\Adapter\Interfaces\IAdapter;
 use Cratia\ORM\DBAL\Interfaces\IQueryDTO;
 use Cratia\ORM\DQL\Filter;
-use Cratia\ORM\DQL\FilterGroup;
 use Cratia\ORM\DQL\Interfaces\IFilter;
-use Cratia\ORM\DQL\Interfaces\ISql;
+use Cratia\ORM\DQL\Interfaces\IQueryDelete;
+use Cratia\ORM\DQL\Interfaces\IQueryInsert;
+use Cratia\ORM\DQL\Interfaces\IQueryUpdate;
 use Cratia\ORM\DQL\Query;
-use Cratia\ORM\DQL\Sql;
+use Cratia\ORM\DQL\QueryDelete;
+use Cratia\ORM\DQL\QueryInsert;
+use Cratia\ORM\DQL\QueryUpdate;
 use Cratia\ORM\Model\Common\ReflectionModel;
 use Cratia\ORM\Model\Common\ReflectionProperty;
 use Cratia\ORM\Model\Events\Payloads\EventModelErrorPayload;
@@ -168,48 +171,36 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
     /**
      * @param IModel $model
      * @param ReflectionProperty[] $fields
-     * @return ISql
+     * @return IQueryInsert
+     * @throws Exception
      */
-    protected function createQueryToCreate(IModel $model, array $fields): ISql
+    protected function createQueryToCreate(IModel $model, array $fields): IQueryInsert
     {
-        $sql_columns = array_map(function (ReflectionProperty $property) {
-            return "{$property->getName()}";
-        }, $fields);
-        $sql_columns = implode('`,`', $sql_columns);
-
-        $sql_values = array_map(function () {
-            return "?";
-        }, $fields);
-        $sql_values = implode(',', $sql_values);
-
-        $sql_params = [];
+        $query = new QueryInsert($model->getFrom());
+        /** @var ReflectionProperty $field */
         foreach ($fields as $field) {
-            if (is_bool($model->{$field->getName()})) {
-                $value = filter_var($model->{$field->getName()}, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-            } else {
-                $value = $model->{$field->getName()};
-            }
-            $sql_params[] = $value;
+            $key = $field->getName();
+            $query
+                ->addField(
+                    $model->getField($key),
+                    $model->{$key}
+                );
         }
-
-        $sql = new Sql();
-        $sql->sentence = "INSERT INTO {$model->getFrom()->getTableSchema()} (`{$sql_columns}`) VALUES ({$sql_values})";
-        $sql->params = array_merge([], $sql_params);
-        return $sql;
+        return $query;
     }
 
     /**
      * @param IModel $model
      * @param $king
-     * @param ISql $sql
+     * @param IQueryInsert|IQueryUpdate|IQueryDelete $query
      * @return IQueryDTO
      * @throws DBALException
      */
-    protected function executeQuery(IModel $model, $king, ISql $sql)
+    protected function executeQuery(IModel $model, $king, $query)
     {
         $time = -microtime(true);
         try {
-            $dto = $this->getQueryExecute()->executeNonQuery($king, $sql);
+            $dto = $this->getQueryExecute()->executeNonQuery($king, $query);
         } catch (Exception $e) {
             throw new DBALException($e->getMessage(), $e->getCode(), $e->getPrevious());
         }
@@ -221,43 +212,30 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
     /**
      * @param IModel $model
      * @param ReflectionProperty[] $fields
-     * @return ISql
+     * @return IQueryUpdate
      * @throws Exception
      */
-    public function createQueryToUpdate(IModel $model, array $fields): ISql
+    public function createQueryToUpdate(IModel $model, array $fields): IQueryUpdate
     {
-        $sql_values = array_map(function (ReflectionProperty $property) {
-            return "`{$property->getName()}` = ?";
-        }, $fields);
-        $sql_values = implode(',', $sql_values);
-
-        $sql_params = array_map(function (ReflectionProperty $property) use ($model) {
-            if (is_bool($model->{$property->getName()})) {
-                $value = filter_var($model->{$property->getName()}, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-            } else {
-                $value = $model->{$property->getName()};
-            }
-            return $value;
-        }, $fields);
-        $sql_params = array_values($sql_params);
-
+        $query = new QueryUpdate($model->getFrom());
+        /** @var ReflectionProperty $field */
+        foreach ($fields as $field) {
+            $query
+                ->addField(
+                    $model->getField($field->getName()),
+                    $model->{$field->getName()}
+                );
+        }
         $keys = $model->getKeys();
-        $where = FilterGroup::and();
+        /** @var string $key */
         foreach ($keys as $key) {
-            if (is_bool($model->{$key})) {
-                $value = filter_var($model->{$key}, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-            } else {
-                $value = $model->{$key};
-            }
-            $where->add(
-                Filter::eq($model->getField($key), $value)
+            $query->addFilter(
+                Filter::eq(
+                    $model->getField($key),
+                    $model->{$key})
             );
         }
-
-        $sql = new Sql();
-        $sql->sentence = "UPDATE {$model->getFrom()->toSQL()->getSentence()} SET {$sql_values} WHERE {$where->toSQL()->getSentence()}";
-        $sql->params = array_merge($model->getFrom()->toSQL()->getParams(), $sql_params, $where->toSQL()->getParams());
-        return $sql;
+        return $query;
     }
 
     /**
@@ -284,38 +262,22 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
     /**
      * @param IModel $model
      * @param ReflectionProperty[] $fields
-     * @return ISql
+     * @return IQueryDelete
      * @throws Exception
      */
-    public function createQueryToDelete(IModel $model, array $fields): ISql
+    public function createQueryToDelete(IModel $model, array $fields): IQueryDelete
     {
-        $where = FilterGroup::and();
+        $query = new QueryDelete($model->getFrom());
         /** @var ReflectionProperty $field */
         foreach ($fields as $field) {
             $key = $field->getName();
-            if (is_bool($model->{$key})) {
-                $value = filter_var($model->{$key}, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-            } else {
-                $value = $model->{$key};
-            }
-            $where->add(
-                Filter::eq($model->getField($key), $value)
+            $query->addFilter(
+                Filter::eq(
+                    $model->getField($key),
+                    $model->{$key})
             );
         }
-        return $this->createQueryToDeleteByFilter($model, $where);
-    }
-
-    /**
-     * @param IModel $model
-     * @param IFilter $filter
-     * @return ISql
-     */
-    public function createQueryToDeleteByFilter(IModel $model, IFilter $filter): ISql
-    {
-        $sql = new Sql();
-        $sql->sentence = "DELETE {$model->getFrom()->getAs()} FROM {$model->getFrom()->toSQL()->getSentence()} WHERE {$filter->toSQL()->getSentence()}";
-        $sql->params = array_merge($model->getFrom()->toSQL()->getParams(), $filter->toSQL()->getParams());
-        return $sql;
+        return $query;
     }
 
     /**
@@ -339,8 +301,8 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
             ->then(function (array $fields) use ($model) {
                 return $this->createQueryToCreate($model, $fields);
             })
-            ->then(function (ISql $sql) use ($model) {
-                return $this->executeQuery($model, IAdapter::CREATE, $sql);
+            ->then(function (IQueryInsert $query) use ($model) {
+                return $this->executeQuery($model, IAdapter::CREATE, $query);
             })
             ->tap(function (IQueryDTO $dto) use ($model) {
                 $this->notify(Events::ON_MODEL_CREATED, new EventModelPayload($model, new Query(), $dto));
@@ -389,8 +351,8 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
             ->then(function (array $fields) use ($model) {
                 return $this->createQueryToUpdate($model, $fields);
             })
-            ->then(function (ISql $sql) use ($model) {
-                return $this->executeQuery($model, IAdapter::UPDATE, $sql);
+            ->then(function (IQueryUpdate $query) use ($model) {
+                return $this->executeQuery($model, IAdapter::UPDATE, $query);
             })
             ->tap(function (IQueryDTO $dto) use ($model) {
                 $this->notify(Events::ON_MODEL_UPDATED, new EventModelPayload($model, new Query(), $dto));
@@ -436,8 +398,8 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
             ->then(function (array $fields) use ($model) {
                 return $this->createQueryToDelete($model, $fields);
             })
-            ->then(function (ISql $sql) use ($model) {
-                return $this->executeQuery($model, IAdapter::DELETE, $sql);
+            ->then(function (IQueryDelete $query) use ($model) {
+                return $this->executeQuery($model, IAdapter::DELETE, $query);
             })
             ->tap(function (IQueryDTO $dto) use ($model) {
                 $this->notify(Events::ON_MODEL_DELETED, new EventModelPayload($model, new Query(), $dto));
@@ -473,10 +435,11 @@ class ActiveRecordWrite extends ActiveRecord implements IStrategyModelWrite
     {
         $result = Pipeline::try(
             function () use ($filter, $model) {
-                return $this->createQueryToDeleteByFilter($model, $filter);
+                return (new QueryDelete($model->getFrom()))
+                    ->addFilter($filter);
             })
-            ->then(function (ISql $sql) use ($model) {
-                return $this->executeQuery($model, IAdapter::DELETE, $sql);
+            ->then(function (IQueryDelete $query) use ($model) {
+                return $this->executeQuery($model, IAdapter::DELETE, $query);
             })
             ->tap(function (IQueryDTO $dto) use ($model) {
                 $this->notify(Events::ON_MODEL_DELETED, new EventModelPayload($model, new Query(), $dto));

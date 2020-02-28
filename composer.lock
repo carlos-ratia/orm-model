@@ -130,16 +130,16 @@
         },
         {
             "name": "cratia/orm-dbal",
-            "version": "0.4.7",
+            "version": "0.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carlos-ratia/orm-dbal.git",
-                "reference": "2bd63b39dff2ecc3112e7b412e0e6ce239c60c36"
+                "reference": "01b26bf55b8b3e315e8beaae0e4a36845f72e782"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carlos-ratia/orm-dbal/zipball/2bd63b39dff2ecc3112e7b412e0e6ce239c60c36",
-                "reference": "2bd63b39dff2ecc3112e7b412e0e6ce239c60c36",
+                "url": "https://api.github.com/repos/carlos-ratia/orm-dbal/zipball/01b26bf55b8b3e315e8beaae0e4a36845f72e782",
+                "reference": "01b26bf55b8b3e315e8beaae0e4a36845f72e782",
                 "shasum": ""
             },
             "require": {
@@ -179,23 +179,24 @@
                 }
             ],
             "description": "Database abstraction layer (DBAL) for execute Query based on https://www.doctrine-project.org/projects/dbal.html",
-            "time": "2020-02-27T22:08:35+00:00"
+            "time": "2020-02-28T19:58:52+00:00"
         },
         {
             "name": "cratia/orm-dql",
-            "version": "0.3.0",
+            "version": "0.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carlos-ratia/orm-dql.git",
-                "reference": "d4c39e0a917466a0124ec97856ba038e4dc9b4c1"
+                "reference": "56eb1edd729ab8ab1d3305f35ac1be2dd9547afa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carlos-ratia/orm-dql/zipball/d4c39e0a917466a0124ec97856ba038e4dc9b4c1",
-                "reference": "d4c39e0a917466a0124ec97856ba038e4dc9b4c1",
+                "url": "https://api.github.com/repos/carlos-ratia/orm-dql/zipball/56eb1edd729ab8ab1d3305f35ac1be2dd9547afa",
+                "reference": "56eb1edd729ab8ab1d3305f35ac1be2dd9547afa",
                 "shasum": ""
             },
             "require": {
+                "ext-json": "*",
                 "php": ">=7.1"
             },
             "require-dev": {
@@ -207,7 +208,7 @@
                     "src/"
                 ],
                 "psr-4": {
-                    "Cratia\\ORM\\": "src/"
+                    "Cratia\\ORM\\DQL\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -221,7 +222,7 @@
                 }
             ],
             "description": "DQL stands for Dialect Query Language and is an Object Query, DQL provides powerful querying capabilities over your object model.",
-            "time": "2020-02-13T14:20:19+00:00"
+            "time": "2020-02-28T19:39:25+00:00"
         },
         {
             "name": "cratia/pipeline",
@@ -1323,26 +1324,25 @@
         },
         {
             "name": "phpdocumentor/type-resolver",
-            "version": "1.0.1",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/TypeResolver.git",
-                "reference": "2e32a6d48972b2c1976ed5d8967145b6cec4a4a9"
+                "reference": "7462d5f123dfc080dfdf26897032a6513644fc95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/2e32a6d48972b2c1976ed5d8967145b6cec4a4a9",
-                "reference": "2e32a6d48972b2c1976ed5d8967145b6cec4a4a9",
+                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/7462d5f123dfc080dfdf26897032a6513644fc95",
+                "reference": "7462d5f123dfc080dfdf26897032a6513644fc95",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1",
+                "php": "^7.2",
                 "phpdocumentor/reflection-common": "^2.0"
             },
             "require-dev": {
-                "ext-tokenizer": "^7.1",
-                "mockery/mockery": "~1",
-                "phpunit/phpunit": "^7.0"
+                "ext-tokenizer": "^7.2",
+                "mockery/mockery": "~1"
             },
             "type": "library",
             "extra": {
@@ -1366,7 +1366,7 @@
                 }
             ],
             "description": "A PSR-5 based resolver of Class names, Types and Structural Element Names",
-            "time": "2019-08-22T18:11:29+00:00"
+            "time": "2020-02-18T18:59:58+00:00"
         },
         {
             "name": "phpspec/prophecy",
